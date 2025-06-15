@@ -20,6 +20,10 @@ To run this React app locally:
 
 ---
 
+## Features Overview
+
+See [Features.md](./Features.md) for a detailed list of features, requirements, user roles, and main pages included in Octo Films.
+
 ## Development Process
 
 First of all, a prototype for Octo Films was created in Figma. You can view the design and user flow here:
