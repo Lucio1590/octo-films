@@ -23,7 +23,7 @@ import { darkTheme, lightTheme } from "./ui/themes";
 
 const GradientBackground = styled(Box)({
   minHeight: "100vh",
-  width: "100vw",
+  margin: 0,
   background: "linear-gradient(135deg, #1a237e 0%, #8e24aa 100%)",
   display: "flex",
   flexDirection: "column",
@@ -143,6 +143,9 @@ function App() {
                   sx={{ fontWeight: 600, px: 4 }}
                   href="/login"
                   aria-label="Login"
+                  disabled={true} // Disable until backend is ready
+                  aria-disabled="true" // For accessibility
+                  // add a tooltip or message explaining why it's disabled
                 >
                   Login
                 </Button>
@@ -153,10 +156,16 @@ function App() {
                   sx={{ fontWeight: 600, px: 4, borderWidth: 2 }}
                   href="/register"
                   aria-label="Create Account"
+                  disabled={true} // Disable until backend is ready
+                  aria-disabled="true" // For accessibility
+                  // add a tooltip or message explaining why it's disabled
                 >
                   Create Account
                 </Button>
               </Stack>
+              <Typography>
+                The authentication system is not yet implemented.
+              </Typography>
               <Typography variant="caption" color="#fff" sx={{ opacity: 0.8 }}>
                 Made by Lucian Diaconu as a student project.{" "}
                 <MuiLink
