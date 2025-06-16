@@ -34,3 +34,12 @@ This prototype served as the foundation for the application's UI and user experi
 Not all features from the prototype were implemented, but the core functionality remains intact.
 
 
+## Special Thanks to the following resources:
+- [React Documentation](https://react.dev/)
+- [React Router Documentation](https://reactrouter.com/en/main)
+- [Redux Documentation](https://redux.js.org/)
+- [Redux Thunk Documentation](https://github.com/reduxjs/redux-thunk)
+- [Redux Toolkit Documentation](https://redux-toolkit.js.org/)
+- [Material UI Documentation](https://mui.com/)
+- [Axios Documentation](https://axios-http.com/docs/intro)
+- [dbdiagram.io](https://dbdiagram.io/) for visualizing and designing the application's database schema
