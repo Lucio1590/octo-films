@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+
+# Ensure the project lints and builds before pushing
+npm run lint || exit 1
+npm run build || exit 1
