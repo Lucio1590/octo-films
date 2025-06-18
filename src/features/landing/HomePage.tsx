@@ -143,7 +143,9 @@ function HomePage() {
                   Create Account
                 </Button>
               </Stack>
-              <Typography>The authentication system is not yet implemented.</Typography>
+              <Typography variant="body2" color="#f3e5f5" sx={{ opacity: 0.9 }}>
+                Ready to dive into the world of cinema? Join our community!
+              </Typography>
               <Typography variant="caption" color="#fff" sx={{ opacity: 0.8 }}>
                 Made by Lucian Diaconu as a student project.{' '}
                 <MuiLink

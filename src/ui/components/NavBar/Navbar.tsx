@@ -11,14 +11,18 @@ import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
 import Tooltip from '@mui/material/Tooltip'
 import MenuItem from '@mui/material/MenuItem'
+import { useNavigate } from 'react-router'
 import NavbarLogo from './NavbarLogo'
-import userData from '../../../hooks/userData'
+import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
+import { logoutUser } from '../../../store/slices/authSlice'
+import { isAdmin, getUserRole } from '../../../utils/auth'
 
 const pages = ['Films', 'Series', 'Reviews', 'Lists', 'Members', 'Stats']
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout']
 
 function Navbar() {
-  const { username } = userData()
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const { user } = useAppSelector((state) => state.auth)
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null)
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null)
@@ -26,6 +30,7 @@ function Navbar() {
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget)
   }
+
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget)
   }
@@ -34,9 +39,64 @@ function Navbar() {
     setAnchorElNav(null)
   }
 
+  const handlePageClick = (page: string) => {
+    handleCloseNavMenu()
+
+    switch (page) {
+      case 'Films':
+        navigate('/films')
+        break
+      case 'Series':
+        // TODO: Implement series page
+        break
+      case 'Reviews':
+        // TODO: Implement reviews page
+        break
+      case 'Lists':
+        // TODO: Implement lists page
+        break
+      case 'Members':
+        // TODO: Implement members page
+        break
+      case 'Stats':
+        // TODO: Implement stats page
+        break
+      default:
+        break
+    }
+  }
+
   const handleCloseUserMenu = () => {
     setAnchorElUser(null)
   }
+
+  const handleMenuItemClick = (setting: string) => {
+    handleCloseUserMenu()
+
+    switch (setting) {
+      case 'Profile':
+        navigate('/profile')
+        break
+      case 'Dashboard':
+        navigate('/dashboard')
+        break
+      case 'Logout':
+        dispatch(logoutUser())
+        navigate('/')
+        break
+      default:
+        // Handle other menu items
+        break
+    }
+  }
+
+  // Create settings array based on user role
+  const settings = [
+    { label: 'Profile', action: 'Profile' },
+    { label: 'Account', action: 'Account' },
+    ...(isAdmin(user) ? [{ label: 'Dashboard', action: 'Dashboard' }] : []),
+    { label: 'Logout', action: 'Logout' },
+  ]
 
   return (
     <AppBar position="static">
@@ -71,7 +131,7 @@ function Navbar() {
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                <MenuItem key={page} onClick={() => handlePageClick(page)}>
                   <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
                 </MenuItem>
               ))}
@@ -80,7 +140,7 @@ function Navbar() {
           <NavbarLogo isMobile />
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
-              <Button key={page} onClick={handleCloseNavMenu} sx={{ my: 2, display: 'block' }}>
+              <Button key={page} onClick={() => handlePageClick(page)} sx={{ my: 2, display: 'block', color: 'white' }}>
                 {page}
               </Button>
             ))}
@@ -88,7 +148,9 @@ function Navbar() {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt={username} src="/static/images/avatar/2.jpg" />
+                <Avatar alt={user?.username || 'User'} sx={{ bgcolor: 'secondary.main' }}>
+                  {user?.username?.charAt(0).toUpperCase() || 'U'}
+                </Avatar>
               </IconButton>
             </Tooltip>
             <Menu
@@ -107,9 +169,31 @@ function Navbar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
+              {/* User info header */}
+              <MenuItem disabled>
+                <Box>
+                  <Typography variant="subtitle2" fontWeight="bold">
+                    {user?.username}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {user?.email}
+                  </Typography>
+                  <Typography variant="caption" color="primary.main" sx={{ display: 'block' }}>
+                    {getUserRole(user)}
+                  </Typography>
+                </Box>
+              </MenuItem>
+
+              {/* Menu items */}
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+                <MenuItem
+                  key={setting.label}
+                  onClick={() => handleMenuItemClick(setting.action)}
+                  sx={{
+                    color: setting.action === 'Logout' ? 'error.main' : 'inherit',
+                  }}
+                >
+                  <Typography sx={{ textAlign: 'center' }}>{setting.label}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -119,4 +203,5 @@ function Navbar() {
     </AppBar>
   )
 }
+
 export default Navbar
