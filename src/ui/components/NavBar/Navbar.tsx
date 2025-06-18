@@ -77,6 +77,10 @@ function Navbar() {
       case 'Profile':
         navigate('/profile')
         break
+      case 'Account':
+        navigate('/account')
+        // at the moment this will redirect to 404 page, as account page is not implemented yet
+        break
       case 'Dashboard':
         navigate('/dashboard')
         break

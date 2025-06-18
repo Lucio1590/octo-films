@@ -22,7 +22,7 @@ function App() {
   const [mode] = useState('dark')
   const theme = mode === 'light' ? lightTheme : darkTheme
 
-  const { isAuthenticated, loading } = useAppSelector((state) => state.auth)
+  const { isAuthenticated } = useAppSelector((state) => state.auth)
 
   // Track if initial auth check has been performed
   const [authInitialized, setAuthInitialized] = useState(false)
@@ -44,7 +44,7 @@ function App() {
   const showNavbar = isAuthenticated && !isPublicRoute
 
   // Show loading spinner during initial auth check
-  if (!authInitialized && loading) {
+  if (!authInitialized) {
     return (
       <ThemeProvider theme={theme}>
         <StyledAppWrapper>
