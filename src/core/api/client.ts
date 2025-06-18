@@ -42,10 +42,11 @@ class ApiClient {
     this.client.interceptors.response.use(
       (response: AxiosResponse) => response,
       (error) => {
-        if (error.response?.status === 401) {
+        if (error.response?.status === 401 || error.response?.status === 403) {
           // Handle unauthorized access
           localStorage.removeItem('authToken')
-          window.location.href = '/login'
+          // Dispatch a custom event for React Router navigation
+          window.dispatchEvent(new CustomEvent('unauthorized'))
         }
 
         const apiError: ApiError = {

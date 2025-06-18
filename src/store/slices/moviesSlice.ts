@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import type { MoviesState, Movie } from '../../core/types'
+import type { MoviesState, Movie, ApiError } from '../../core/types'
 import { MoviesService } from '../../services/moviesService'
 
 // Initial state
@@ -107,7 +107,7 @@ const moviesSlice = createSlice({
       })
       .addCase(fetchMovies.rejected, (state, action) => {
         state.loading = false
-        state.error = action.payload as string
+        state.error = getErrorMessage(action.payload)
       })
       // Fetch movie by ID cases
       .addCase(fetchMovieById.pending, (state) => {
@@ -121,7 +121,7 @@ const moviesSlice = createSlice({
       })
       .addCase(fetchMovieById.rejected, (state, action) => {
         state.loading = false
-        state.error = action.payload as string
+        state.error = getErrorMessage(action.payload)
       })
       // Create movie cases
       .addCase(createMovie.pending, (state) => {
@@ -135,7 +135,7 @@ const moviesSlice = createSlice({
       })
       .addCase(createMovie.rejected, (state, action) => {
         state.loading = false
-        state.error = action.payload as string
+        state.error = getErrorMessage(action.payload)
       })
       // Update movie cases
       .addCase(updateMovie.pending, (state) => {
@@ -155,7 +155,7 @@ const moviesSlice = createSlice({
       })
       .addCase(updateMovie.rejected, (state, action) => {
         state.loading = false
-        state.error = action.payload as string
+        state.error = getErrorMessage(action.payload)
       })
       // Delete movie cases
       .addCase(deleteMovie.pending, (state) => {
@@ -172,10 +172,30 @@ const moviesSlice = createSlice({
       })
       .addCase(deleteMovie.rejected, (state, action) => {
         state.loading = false
-        state.error = action.payload as string
+        state.error = getErrorMessage(action.payload)
       })
   },
 })
+
+function isApiError(payload: unknown): payload is ApiError {
+  return (
+    typeof payload === 'object' &&
+    payload !== null &&
+    'error' in payload &&
+    typeof (payload as { error?: unknown }).error === 'object' &&
+    (payload as { error?: unknown }).error !== null &&
+    'message' in (payload as { error: { message?: unknown } }).error &&
+    typeof (payload as { error: { message?: unknown } }).error.message === 'string'
+  )
+}
+
+function getErrorMessage(payload: unknown): string {
+  if (isApiError(payload)) {
+    return payload.error.message
+  }
+  if (typeof payload === 'string') return payload
+  return 'An unknown error occurred'
+}
 
 export const { clearError, clearCurrentMovie, setCurrentMovie } = moviesSlice.actions
 export default moviesSlice.reducer
