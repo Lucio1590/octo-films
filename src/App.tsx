@@ -44,7 +44,7 @@ function App() {
   const showNavbar = isAuthenticated && !isPublicRoute
 
   // Show loading spinner during initial auth check
-  if (!authInitialized) {
+  if (loading) {
     return (
       <ThemeProvider theme={theme}>
         <StyledAppWrapper>
