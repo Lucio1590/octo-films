@@ -2,7 +2,6 @@ import { useState } from 'react'
 import {
   Box,
   Typography,
-  Button,
   Container,
   Stack,
   Fade,
@@ -14,12 +13,14 @@ import {
   IconButton,
   CssBaseline,
   ThemeProvider,
+  Button,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import octoFilmsLogo from '/logo.svg'
 import { darkTheme, lightTheme } from '../../ui/themes'
+import { Link } from 'react-router'
 
 const GradientBackground = styled(Box)({
   minHeight: '100vh',
@@ -120,33 +121,31 @@ function HomePage() {
               </Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center" sx={{ mb: 2 }}>
                 <Button
+                  component={Link}
+                  to="/login"
                   variant="contained"
                   color="secondary"
                   size="large"
                   sx={{ fontWeight: 600, px: 4 }}
-                  href="/login"
                   aria-label="Login"
-                  disabled={true} // Disable until backend is ready
-                  aria-disabled="true" // For accessibility
-                  // add a tooltip or message explaining why it's disabled
                 >
                   Login
                 </Button>
                 <Button
+                  component={Link}
+                  to="/register"
                   variant="outlined"
                   color="secondary"
                   size="large"
                   sx={{ fontWeight: 600, px: 4, borderWidth: 2 }}
-                  href="/register"
                   aria-label="Create Account"
-                  disabled={true} // Disable until backend is ready
-                  aria-disabled="true" // For accessibility
-                  // add a tooltip or message explaining why it's disabled
                 >
                   Create Account
                 </Button>
               </Stack>
-              <Typography>The authentication system is not yet implemented.</Typography>
+              <Typography variant="body2" color="#f3e5f5" sx={{ opacity: 0.9 }}>
+                Ready to dive into the world of cinema? Join our community!
+              </Typography>
               <Typography variant="caption" color="#fff" sx={{ opacity: 0.8 }}>
                 Made by Lucian Diaconu as a student project.{' '}
                 <MuiLink
