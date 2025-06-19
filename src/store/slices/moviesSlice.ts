@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import type { MoviesState, Movie, ApiError } from '../../core/types'
+import type { MoviesState, Movie, ApiError, ImportProgress } from '../../core/types'
 import { MoviesService } from '../../services/moviesService'
+import { mapTMDBMovieToBackend, parseTMDBJSON, isValidTMDBMovie } from '../../utils/tmdbMapper'
 
 // Initial state
 const initialState: MoviesState = {
@@ -9,6 +10,8 @@ const initialState: MoviesState = {
   loading: false,
   error: null,
   currentMovie: null,
+  importing: false,
+  importProgress: null,
 }
 
 // Async thunks
@@ -81,6 +84,79 @@ export const deleteMovieByDocumentId = createAsyncThunk(
   },
 )
 
+export const importMoviesFromJSON = createAsyncThunk(
+  'movies/importMoviesFromJSON',
+  async (jsonContent: string, { rejectWithValue, dispatch }) => {
+    try {
+      // Parse the JSON and extract TMDB movies
+      const tmdbMovies = parseTMDBJSON(jsonContent)
+
+      // Validate and filter movies
+      const validMovies = tmdbMovies.filter(isValidTMDBMovie)
+
+      if (validMovies.length === 0) {
+        throw new Error('No valid movies found in the JSON file')
+      }
+
+      const results = {
+        total: validMovies.length,
+        completed: 0,
+        failed: 0,
+        errors: [] as string[],
+        importedMovies: [] as Movie[],
+      }
+
+      // Import movies one by one
+      for (let i = 0; i < validMovies.length; i++) {
+        try {
+          const tmdbMovie = validMovies[i]
+          const movieData = mapTMDBMovieToBackend(tmdbMovie)
+
+          // Update progress
+          dispatch(
+            updateImportProgress({
+              total: results.total,
+              completed: i,
+              failed: results.failed,
+              errors: results.errors,
+            }),
+          )
+
+          const response = await MoviesService.createMovie(movieData)
+          results.importedMovies.push(response.data)
+          results.completed++
+        } catch (error) {
+          results.failed++
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+          results.errors.push(`Movie "${validMovies[i].title}": ${errorMessage}`)
+        }
+      }
+
+      // Final progress update
+      dispatch(
+        updateImportProgress({
+          total: results.total,
+          completed: results.completed,
+          failed: results.failed,
+          errors: results.errors,
+        }),
+      )
+
+      return {
+        imported: results.importedMovies,
+        summary: {
+          total: results.total,
+          completed: results.completed,
+          failed: results.failed,
+          errors: results.errors,
+        },
+      }
+    } catch (error) {
+      return rejectWithValue(error)
+    }
+  },
+)
+
 // Movies slice
 const moviesSlice = createSlice({
   name: 'movies',
@@ -94,6 +170,21 @@ const moviesSlice = createSlice({
     },
     setCurrentMovie: (state, action: PayloadAction<Movie>) => {
       state.currentMovie = action.payload
+    },
+    updateImportProgress: (state, action: PayloadAction<ImportProgress>) => {
+      state.importProgress = action.payload
+    },
+    startImport: (state) => {
+      state.importing = true
+      state.importProgress = null
+      state.error = null
+    },
+    finishImport: (state) => {
+      state.importing = false
+    },
+    clearImportProgress: (state) => {
+      state.importProgress = null
+      state.importing = false
     },
   },
   extraReducers: (builder) => {
@@ -177,6 +268,24 @@ const moviesSlice = createSlice({
         state.loading = false
         state.error = getErrorMessage(action.payload)
       })
+      // Import movies cases
+      .addCase(importMoviesFromJSON.pending, (state) => {
+        state.importing = true
+        state.importProgress = null
+        state.error = null
+      })
+      .addCase(importMoviesFromJSON.fulfilled, (state, action) => {
+        state.importing = false
+        // Add successfully imported movies to the state
+        if (action.payload.imported.length > 0) {
+          state.movies.push(...action.payload.imported)
+        }
+        state.error = null
+      })
+      .addCase(importMoviesFromJSON.rejected, (state, action) => {
+        state.importing = false
+        state.error = getErrorMessage(action.payload)
+      })
   },
 })
 
@@ -200,5 +309,13 @@ function getErrorMessage(payload: unknown): string {
   return 'An unknown error occurred'
 }
 
-export const { clearError, clearCurrentMovie, setCurrentMovie } = moviesSlice.actions
+export const {
+  clearError,
+  clearCurrentMovie,
+  setCurrentMovie,
+  updateImportProgress,
+  startImport,
+  finishImport,
+  clearImportProgress,
+} = moviesSlice.actions
 export default moviesSlice.reducer
