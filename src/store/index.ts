@@ -7,12 +7,6 @@ export const store = configureStore({
     auth: authReducer,
     movies: moviesReducer,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
-      },
-    }),
   devTools: import.meta.env.MODE !== 'production',
 })
 
