@@ -1,10 +1,12 @@
-import { Typography, Box, Paper, Alert } from '@mui/material'
+import { Typography, Box, Paper, Button } from '@mui/material'
 import { useAppSelector } from '../../hooks/redux'
 import { isAdmin } from '../../utils/auth'
-import { Navigate } from 'react-router'
+import { Navigate, useNavigate } from 'react-router'
+import MovieTable from './MovieTable'
 
 export default function Dashboard() {
   const { user } = useAppSelector((state) => state.auth)
+  const navigate = useNavigate()
 
   // Check if user is logged in and has admin privileges
   if (!isAdmin(user)) {
@@ -14,44 +16,23 @@ export default function Dashboard() {
   return (
     <Box sx={{ py: 4 }}>
       <Paper sx={{ p: 4 }}>
-        <Typography variant="h3" gutterBottom>
-          Admin Dashboard
-        </Typography>
-        <Alert severity="info" sx={{ mb: 3 }}>
-          Welcome to the admin dashboard, {user?.username}! You have {user?.role?.name} privileges.
-        </Alert>
-        <Typography variant="h6" color="text.secondary" gutterBottom>
-          Dashboard Features (Coming Soon):
-        </Typography>
-        <Box component="ul" sx={{ pl: 3 }}>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            User Management
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h3" gutterBottom>
+            Admin Dashboard
           </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            Content Moderation
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            Analytics & Reports
-          </Typography>
-          <Typography component="li" variant="body1" sx={{ mb: 1 }}>
-            System Settings
-          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate('/create-film')}
+            data-testid="create-film-btn"
+          >
+            Create Film
+          </Button>
         </Box>
-
-        <Box sx={{ mt: 4, p: 2, bgcolor: 'grey.100', color: 'black', borderRadius: 1 }}>
-          <Typography variant="subtitle2" gutterBottom>
-            Your Role Information:
-          </Typography>
-          <Typography variant="body2">
-            <strong>Role:</strong> {user?.role?.name}
-          </Typography>
-          <Typography variant="body2">
-            <strong>Type:</strong> {user?.role?.type}
-          </Typography>
-          <Typography variant="body2">
-            <strong>Description:</strong> {user?.role?.description}
-          </Typography>
-        </Box>
+        <Typography variant="body1" color="text.secondary" gutterBottom>
+          Manage all films in the database below.
+        </Typography>
+        <MovieTable />
       </Paper>
     </Box>
   )

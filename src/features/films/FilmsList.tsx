@@ -128,10 +128,10 @@ const FilmsList = () => {
           ))}
         </List>
 
-        {/* Debug information - can be removed later */}
+        {/* Debug information - will be removed later */}
         <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
           <Typography variant="caption" color="text.secondary">
-            <strong>API Status:</strong> Successfully loaded {movies.length} movies from Strapi backend
+            <strong>API Status:</strong> Successfully loaded {movies.length} movies from backend
           </Typography>
         </Box>
       </Paper>
