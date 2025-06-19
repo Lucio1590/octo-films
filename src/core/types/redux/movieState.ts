@@ -7,6 +7,13 @@ export interface ImportProgress {
   errors: string[]
 }
 
+export interface PaginationInfo {
+  page: number
+  pageSize: number
+  pageCount: number
+  total: number
+}
+
 export interface MoviesState {
   movies: Movie[]
   loading: boolean
@@ -14,4 +21,5 @@ export interface MoviesState {
   currentMovie: Movie | null
   importing: boolean
   importProgress: ImportProgress | null
+  pagination: PaginationInfo | null
 }

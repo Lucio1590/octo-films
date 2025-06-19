@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Box,
   Typography,
@@ -10,24 +10,32 @@ import {
   Alert,
   Chip,
   Divider,
+  Pagination,
 } from '@mui/material'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { fetchMovies } from '../../store/slices/moviesSlice'
 
 const FilmsList = () => {
   const dispatch = useAppDispatch()
-  const { movies, loading, error } = useAppSelector((state) => state.movies)
+  const [currentPage, setCurrentPage] = useState(1)
+  const { movies, loading, error, pagination } = useAppSelector((state) => state.movies)
+
+  const pageSize = 5
 
   useEffect(() => {
-    // Fetch movies when component mounts
+    // Fetch movies when component mounts or page changes
     dispatch(
       fetchMovies({
-        // Include poster images
-        sort: 'title:asc', // Sort alphabetically by title
-        pageSize: 50, // Limit to 50 movies for now
+        sort: 'release_date:asc', // Sort alphabetically by title
+        pageSize: pageSize,
+        page: currentPage,
       }),
     )
-  }, [dispatch])
+  }, [dispatch, currentPage])
+
+  const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
+    setCurrentPage(page)
+  }
 
   if (loading) {
     return (
@@ -72,7 +80,11 @@ const FilmsList = () => {
           Films Collection
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          {movies.length} film{movies.length !== 1 ? 's' : ''} available
+          {pagination
+            ? `Showing ${movies.length} of ${pagination.total} film${pagination.total !== 1 ? 's' : ''} (Page ${
+                pagination.page
+              } of ${pagination.pageCount})`
+            : `${movies.length} film${movies.length !== 1 ? 's' : ''} available`}
         </Typography>
 
         <Divider sx={{ mb: 2 }} />
@@ -128,12 +140,17 @@ const FilmsList = () => {
           ))}
         </List>
 
-        {/* Debug information - will be removed later */}
-        <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-          <Typography variant="caption" color="text.secondary">
-            <strong>API Status:</strong> Successfully loaded {movies.length} movies from backend
-          </Typography>
-        </Box>
+        {pagination && pagination.pageCount > 1 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+            <Pagination
+              count={pagination.pageCount}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="primary"
+              size="large"
+            />
+          </Box>
+        )}
       </Paper>
     </Box>
   )

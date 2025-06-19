@@ -12,6 +12,7 @@ const initialState: MoviesState = {
   currentMovie: null,
   importing: false,
   importProgress: null,
+  pagination: null,
 }
 
 // Async thunks
@@ -29,7 +30,7 @@ export const fetchMovies = createAsyncThunk(
   ) => {
     try {
       const response = await MoviesService.getMovies(params)
-      return response.data
+      return response // Return the complete response including pagination metadata
     } catch (error) {
       return rejectWithValue(error)
     }
@@ -196,7 +197,8 @@ const moviesSlice = createSlice({
       })
       .addCase(fetchMovies.fulfilled, (state, action) => {
         state.loading = false
-        state.movies = action.payload
+        state.movies = action.payload.data
+        state.pagination = action.payload.meta?.pagination || null
         state.error = null
       })
       .addCase(fetchMovies.rejected, (state, action) => {
