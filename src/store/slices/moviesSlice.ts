@@ -13,6 +13,10 @@ const initialState: MoviesState = {
   importing: false,
   importProgress: null,
   pagination: null,
+  sort: {
+    field: 'title',
+    direction: 'asc',
+  },
 }
 
 // Async thunks
@@ -172,6 +176,9 @@ const moviesSlice = createSlice({
     setCurrentMovie: (state, action: PayloadAction<Movie>) => {
       state.currentMovie = action.payload
     },
+    setSortOptions: (state, action: PayloadAction<{ field: 'title' | 'release_date'; direction: 'asc' | 'desc' }>) => {
+      state.sort = action.payload
+    },
     updateImportProgress: (state, action: PayloadAction<ImportProgress>) => {
       state.importProgress = action.payload
     },
@@ -315,6 +322,7 @@ export const {
   clearError,
   clearCurrentMovie,
   setCurrentMovie,
+  setSortOptions,
   updateImportProgress,
   startImport,
   finishImport,

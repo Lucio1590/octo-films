@@ -1,19 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Box, Typography, Paper, CircularProgress, Alert, Divider, Pagination, styled } from '@mui/material'
+import type { SelectChangeEvent } from '@mui/material'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
-import { fetchMovies } from '../../store/slices/moviesSlice'
+import { fetchMovies, setSortOptions } from '../../store/slices/moviesSlice'
+import { useNavigate } from 'react-router'
 import FilmCard from './FilmCard'
-
-// sx={{
-//             display: 'grid',
-//             gridTemplateColumns: {
-//               xs: '1fr',
-//               sm: 'repeat(2, 1fr)',
-//               md: 'repeat(3, 1fr)',
-//               lg: 'repeat(4, 1fr)',
-//             },
-//             gap: 3,
-//           }}
+import FilmSorting from '../../ui/components/FilmSorting'
 
 const StyledMoviesListContainer = styled(Box)`
   display: grid;
@@ -21,26 +13,52 @@ const StyledMoviesListContainer = styled(Box)`
   gap: ${({ theme }) => theme.spacing(3)};
 `
 
+const StyledFilmCollectionHeader = styled(Box)`
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: ${({ theme }) => theme.spacing(1)};
+  @media (max-width: 1000px) {
+    flex-direction: column;
+    align-items: center;
+    gap: ${({ theme }) => theme.spacing(2)};
+  }
+`
+
 const FilmsList = () => {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const [currentPage, setCurrentPage] = useState(1)
-  const { movies, loading, error, pagination } = useAppSelector((state) => state.movies)
+  const { movies, loading, error, pagination, sort } = useAppSelector((state) => state.movies)
 
-  const pageSize = 6
+  const pageSize = 12
 
   useEffect(() => {
-    // Fetch movies when component mounts or page changes
+    const sortString = `${sort.field}:${sort.direction}`
     dispatch(
       fetchMovies({
-        sort: 'release_date:asc', // Sort alphabetically by title
+        sort: sortString,
         pageSize: pageSize,
         page: currentPage,
       }),
     )
-  }, [dispatch, currentPage])
+  }, [dispatch, currentPage, sort])
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page)
+  }
+
+  const handleSortFieldChange = (event: SelectChangeEvent) => {
+    const field = event.target.value as 'title' | 'release_date'
+    dispatch(setSortOptions({ field, direction: sort.direction }))
+    setCurrentPage(1) // Reset to first page when sorting changes
+  }
+
+  const handleSortDirectionChange = (event: SelectChangeEvent) => {
+    const direction = event.target.value as 'asc' | 'desc'
+    dispatch(setSortOptions({ field: sort.field, direction }))
+    setCurrentPage(1) // Reset to first page when sorting changes
   }
 
   if (loading) {
@@ -82,10 +100,14 @@ const FilmsList = () => {
   return (
     <Box sx={{ py: 2 }}>
       <Paper sx={{ p: 3 }}>
-        <Box display="flex" flexDirection="row" alignItems="baseline" justifyContent="space-between" mb={1}>
+        <StyledFilmCollectionHeader>
           <Typography variant="h4" gutterBottom>
             Films Collection
           </Typography>
+          <FilmSorting
+            handleSortDirectionChange={handleSortDirectionChange}
+            handleSortFieldChange={handleSortFieldChange}
+          />
           <Typography variant="body2" color="text.secondary">
             {pagination
               ? `Showing ${movies.length} of ${pagination.total} film${pagination.total !== 1 ? 's' : ''} (Page ${
@@ -93,7 +115,7 @@ const FilmsList = () => {
                 } of ${pagination.pageCount})`
               : `${movies.length} film${movies.length !== 1 ? 's' : ''} available`}
           </Typography>
-        </Box>
+        </StyledFilmCollectionHeader>
 
         <Divider sx={{ mb: 2 }} />
 
@@ -103,8 +125,8 @@ const FilmsList = () => {
               <FilmCard
                 movie={movie}
                 onClick={() => {
-                  // Handle click to view movie details - could navigate to detail page
-                  console.log('Clicked movie:', movie.title)
+                  // Navigate to film detail page
+                  navigate(`/films/${movie.documentId}`)
                 }}
               />
             </Box>

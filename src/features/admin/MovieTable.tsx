@@ -15,32 +15,47 @@ import {
   Tooltip,
   Pagination,
 } from '@mui/material'
+import type { SelectChangeEvent } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
-import { fetchMovies, deleteMovieByDocumentId } from '../../store/slices/moviesSlice'
+import { fetchMovies, deleteMovieByDocumentId, setSortOptions } from '../../store/slices/moviesSlice'
 import { useNavigate } from 'react-router'
+import FilmSorting from '../../ui/components/FilmSorting'
 
 export default function MovieTable() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const [currentPage, setCurrentPage] = useState(1)
-  const { movies, loading, error, pagination } = useAppSelector((state) => state.movies)
+  const { movies, loading, error, pagination, sort } = useAppSelector((state) => state.movies)
 
   const pageSize = 5
 
   useEffect(() => {
+    const sortString = `${sort.field}:${sort.direction}`
     dispatch(
       fetchMovies({
-        sort: 'release_date:asc',
+        sort: sortString,
         pageSize: pageSize,
         page: currentPage,
       }),
     )
-  }, [dispatch, currentPage])
+  }, [dispatch, currentPage, sort])
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page)
+  }
+
+  const handleSortFieldChange = (event: SelectChangeEvent) => {
+    const field = event.target.value as 'title' | 'release_date'
+    dispatch(setSortOptions({ field, direction: sort.direction }))
+    setCurrentPage(1) // Reset to first page when sorting changes
+  }
+
+  const handleSortDirectionChange = (event: SelectChangeEvent) => {
+    const direction = event.target.value as 'asc' | 'desc'
+    dispatch(setSortOptions({ field: sort.field, direction }))
+    setCurrentPage(1) // Reset to first page when sorting changes
   }
 
   const handleEdit = (movie: { id: number; documentId: string }) => {
@@ -79,6 +94,11 @@ export default function MovieTable() {
 
   return (
     <Box>
+      <FilmSorting
+        handleSortDirectionChange={handleSortDirectionChange}
+        handleSortFieldChange={handleSortFieldChange}
+      />
+
       <TableContainer component={Paper} sx={{ mt: 2 }}>
         <Table size="small">
           <TableHead>

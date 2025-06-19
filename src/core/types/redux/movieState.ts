@@ -14,6 +14,11 @@ export interface PaginationInfo {
   total: number
 }
 
+export interface SortInfo {
+  field: 'title' | 'release_date'
+  direction: 'asc' | 'desc'
+}
+
 export interface MoviesState {
   movies: Movie[]
   loading: boolean
@@ -22,4 +27,5 @@ export interface MoviesState {
   importing: boolean
   importProgress: ImportProgress | null
   pagination: PaginationInfo | null
+  sort: SortInfo
 }
