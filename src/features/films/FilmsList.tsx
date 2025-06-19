@@ -1,26 +1,32 @@
 import { useEffect, useState } from 'react'
-import {
-  Box,
-  Typography,
-  Paper,
-  List,
-  ListItem,
-  ListItemText,
-  CircularProgress,
-  Alert,
-  Chip,
-  Divider,
-  Pagination,
-} from '@mui/material'
+import { Box, Typography, Paper, CircularProgress, Alert, Divider, Pagination, styled } from '@mui/material'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { fetchMovies } from '../../store/slices/moviesSlice'
+import FilmCard from './FilmCard'
+
+// sx={{
+//             display: 'grid',
+//             gridTemplateColumns: {
+//               xs: '1fr',
+//               sm: 'repeat(2, 1fr)',
+//               md: 'repeat(3, 1fr)',
+//               lg: 'repeat(4, 1fr)',
+//             },
+//             gap: 3,
+//           }}
+
+const StyledMoviesListContainer = styled(Box)`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: ${({ theme }) => theme.spacing(3)};
+`
 
 const FilmsList = () => {
   const dispatch = useAppDispatch()
   const [currentPage, setCurrentPage] = useState(1)
   const { movies, loading, error, pagination } = useAppSelector((state) => state.movies)
 
-  const pageSize = 5
+  const pageSize = 6
 
   useEffect(() => {
     // Fetch movies when component mounts or page changes
@@ -76,69 +82,34 @@ const FilmsList = () => {
   return (
     <Box sx={{ py: 2 }}>
       <Paper sx={{ p: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          Films Collection
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          {pagination
-            ? `Showing ${movies.length} of ${pagination.total} film${pagination.total !== 1 ? 's' : ''} (Page ${
-                pagination.page
-              } of ${pagination.pageCount})`
-            : `${movies.length} film${movies.length !== 1 ? 's' : ''} available`}
-        </Typography>
+        <Box display="flex" flexDirection="row" alignItems="baseline" justifyContent="space-between" mb={1}>
+          <Typography variant="h4" gutterBottom>
+            Films Collection
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {pagination
+              ? `Showing ${movies.length} of ${pagination.total} film${pagination.total !== 1 ? 's' : ''} (Page ${
+                  pagination.page
+                } of ${pagination.pageCount})`
+              : `${movies.length} film${movies.length !== 1 ? 's' : ''} available`}
+          </Typography>
+        </Box>
 
         <Divider sx={{ mb: 2 }} />
 
-        <List>
+        <StyledMoviesListContainer>
           {movies.map((movie) => (
-            <ListItem
-              key={movie.id}
-              sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 1,
-                mb: 1,
-                '&:hover': {
-                  backgroundColor: 'action.hover',
-                },
-              }}
-            >
-              <ListItemText
-                primary={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="h6" component="span">
-                      {movie.title}
-                    </Typography>
-                    {movie.release_date && (
-                      <Chip label={new Date(movie.release_date).getFullYear()} size="small" variant="outlined" />
-                    )}
-                  </Box>
-                }
-                secondary={
-                  <Box sx={{ mt: 1 }}>
-                    {movie.description && (
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        {movie.description.length > 150
-                          ? `${movie.description.substring(0, 150)}...`
-                          : movie.description}
-                      </Typography>
-                    )}
-                    <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                      {movie.average_rating && (
-                        <Typography variant="caption" color="text.secondary">
-                          <strong>Rating:</strong> {movie.average_rating}/10
-                        </Typography>
-                      )}
-                      <Typography variant="caption" color="text.secondary">
-                        <strong>Updated:</strong> {new Date(movie.updatedAt).toLocaleDateString()}
-                      </Typography>
-                    </Box>
-                  </Box>
-                }
+            <Box key={movie.id}>
+              <FilmCard
+                movie={movie}
+                onClick={() => {
+                  // Handle click to view movie details - could navigate to detail page
+                  console.log('Clicked movie:', movie.title)
+                }}
               />
-            </ListItem>
+            </Box>
           ))}
-        </List>
+        </StyledMoviesListContainer>
 
         {pagination && pagination.pageCount > 1 && (
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
