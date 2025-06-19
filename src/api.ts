@@ -23,9 +23,14 @@ export {
   createMovie,
   updateMovieByDocumentId,
   deleteMovieByDocumentId,
+  importMoviesFromJSON,
   clearError as clearMoviesError,
   clearCurrentMovie,
   setCurrentMovie,
+  updateImportProgress,
+  startImport,
+  finishImport,
+  clearImportProgress,
 } from './store/slices/moviesSlice'
 
 // Services

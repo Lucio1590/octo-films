@@ -24,6 +24,16 @@ To run this React app locally:
 
 See [Features.md](./Features.md) for a detailed list of features, requirements, user roles, and main pages included in Octo Films.
 
+### Import Movies from JSON
+
+Admin users can import multiple movies from TMDB JSON files. This feature allows:
+- Bulk import of movies from TMDB API responses
+- Real-time progress tracking
+- Error handling for invalid or duplicate entries
+- Automatic mapping from TMDB format to backend Movie format
+
+See [IMPORT_GUIDE.md](./IMPORT_GUIDE.md) for detailed instructions on using this feature.
+
 ## Development Process
 
 First of all, a prototype for Octo Films was created in Figma. You can view the design and user flow here:

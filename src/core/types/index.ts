@@ -4,5 +4,6 @@ export * from './generics'
 export * from './userAuthTypes'
 // Movie types
 export * from './movie'
+export * from './tmdb'
 // Redux state types
 export * from './redux'
