@@ -8,8 +8,8 @@ import { apiClient } from '../core/api/client'
  */
 export class MoviesService {
   /**
-   * Fetches a paginated list of movies from Strapi.
-   * Supports Strapi's query parameters for pagination, population, sorting, and filtering.
+   * Fetches a paginated list of movies from the hosted backend.
+   * Supports query parameters for pagination, population, sorting, and filtering.
    * @param params - Optional query parameters for pagination, population, sorting, and filtering.
    */
   static async getMovies(params?: {
@@ -21,7 +21,7 @@ export class MoviesService {
   }): Promise<MoviesResponse> {
     const searchParams = new URLSearchParams()
 
-    // Strapi uses 'pagination[page]' and 'pagination[pageSize]' for pagination
+    // The backend uses 'pagination[page]' and 'pagination[pageSize]' for pagination
     if (params?.page) {
       searchParams.append('pagination[page]', params.page.toString())
     }
@@ -30,12 +30,11 @@ export class MoviesService {
       searchParams.append('pagination[pageSize]', params.pageSize.toString())
     }
 
-    // 'populate' is used by Strapi to include related entities
+    // 'populate' is used to include related entities
     if (params?.populate) {
       searchParams.append('populate', params.populate)
     }
 
-    // 'sort' is used by Strapi to sort results
     if (params?.sort) {
       searchParams.append('sort', params.sort)
     }
@@ -52,17 +51,16 @@ export class MoviesService {
     const queryString = searchParams.toString()
     const url = `/api/movies${queryString ? `?${queryString}` : ''}`
 
-    // Uses a generic API client to send a GET request to the Strapi movies endpoint
     return apiClient.get<MoviesResponse>(url)
   }
 
   /**
-   * Fetches a single movie by its ID from Strapi.
-   * Supports Strapi's 'populate' parameter to include related entities.
-   * @param id - The ID of the movie to fetch.
+   * Fetches a single movie by its documentId.
+   * Supports 'populate' parameter to include related entities.
+   * @param documentId - The documentId of the movie to fetch.
    * @param populate - Optional populate parameter for Strapi.
    */
-  static async getMovieById(id: number, populate?: string): Promise<{ data: Movie }> {
+  static async getMovieByDocumentId(documentId: string, populate?: string): Promise<{ data: Movie }> {
     const searchParams = new URLSearchParams()
 
     if (populate) {
@@ -70,39 +68,35 @@ export class MoviesService {
     }
 
     const queryString = searchParams.toString()
-    const url = `/api/movies/${id}${queryString ? `?${queryString}` : ''}`
+    const url = `/api/movies/${documentId}${queryString ? `?${queryString}` : ''}`
 
-    // Uses the API client to fetch a single movie from Strapi
     return apiClient.get<{ data: Movie }>(url)
   }
 
   /**
-   * Creates a new movie entry in Strapi.
+   * Creates a new movie entry.
    * The payload structure follows Strapi's convention: { data: movieData }
    * @param movieData - Partial movie data to create.
    */
   static async createMovie(movieData: Partial<Movie>): Promise<{ data: Movie }> {
-    // POST request to Strapi's movies endpoint with the required data structure
     return apiClient.post<{ data: Movie }>('/api/movies', { data: movieData })
   }
 
   /**
-   * Updates an existing movie entry in Strapi.
+   * Updates an existing movie entry using documentId.
    * The payload structure follows Strapi's convention: { data: movieData }
-   * @param id - The ID of the movie to update.
+   * @param documentId - The documentId of the movie to update.
    * @param movieData - Partial movie data to update.
    */
-  static async updateMovie(id: number, movieData: Partial<Movie>): Promise<{ data: Movie }> {
-    // PUT request to Strapi's movies endpoint with the required data structure
-    return apiClient.put<{ data: Movie }>(`/api/movies/${id}`, { data: movieData })
+  static async updateMovieByDocumentId(documentId: string, movieData: Partial<Movie>): Promise<{ data: Movie }> {
+    return apiClient.put<{ data: Movie }>(`/api/movies/${documentId}`, { data: movieData })
   }
 
   /**
-   * Deletes a movie entry from Strapi by its ID.
-   * @param id - The ID of the movie to delete.
+   * Deletes a movie entry by its documentId.
+   * @param documentId - The documentId of the movie to delete.
    */
-  static async deleteMovie(id: number): Promise<{ data: Movie }> {
-    // DELETE request to Strapi's movies endpoint
-    return apiClient.delete<{ data: Movie }>(`/api/movies/${id}`)
+  static async deleteMovieByDocumentId(documentId: string): Promise<{ data: Movie }> {
+    return apiClient.delete<{ data: Movie }>(`/api/movies/${documentId}`)
   }
 }
