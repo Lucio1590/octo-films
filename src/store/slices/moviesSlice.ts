@@ -33,11 +33,11 @@ export const fetchMovies = createAsyncThunk(
   },
 )
 
-export const fetchMovieById = createAsyncThunk(
-  'movies/fetchMovieById',
-  async (params: { id: number; populate?: string }, { rejectWithValue }) => {
+export const fetchMovieByDocumentId = createAsyncThunk(
+  'movies/fetchMovieByDocumentId',
+  async (params: { documentId: string; populate?: string }, { rejectWithValue }) => {
     try {
-      const response = await MoviesService.getMovieById(params.id, params.populate)
+      const response = await MoviesService.getMovieByDocumentId(params.documentId, params.populate)
       return response.data
     } catch (error) {
       return rejectWithValue(error)
@@ -57,11 +57,11 @@ export const createMovie = createAsyncThunk(
   },
 )
 
-export const updateMovie = createAsyncThunk(
-  'movies/updateMovie',
-  async (params: { id: number; data: Partial<Movie> }, { rejectWithValue }) => {
+export const updateMovieByDocumentId = createAsyncThunk(
+  'movies/updateMovieByDocumentId',
+  async (params: { documentId: string; data: Partial<Movie> }, { rejectWithValue }) => {
     try {
-      const response = await MoviesService.updateMovie(params.id, params.data)
+      const response = await MoviesService.updateMovieByDocumentId(params.documentId, params.data)
       return response.data
     } catch (error) {
       return rejectWithValue(error)
@@ -69,14 +69,17 @@ export const updateMovie = createAsyncThunk(
   },
 )
 
-export const deleteMovie = createAsyncThunk('movies/deleteMovie', async (id: number, { rejectWithValue }) => {
-  try {
-    await MoviesService.deleteMovie(id)
-    return id
-  } catch (error) {
-    return rejectWithValue(error)
-  }
-})
+export const deleteMovieByDocumentId = createAsyncThunk(
+  'movies/deleteMovieByDocumentId',
+  async (documentId: string, { rejectWithValue }) => {
+    try {
+      await MoviesService.deleteMovieByDocumentId(documentId)
+      return documentId
+    } catch (error) {
+      return rejectWithValue(error)
+    }
+  },
+)
 
 // Movies slice
 const moviesSlice = createSlice({
@@ -109,17 +112,17 @@ const moviesSlice = createSlice({
         state.loading = false
         state.error = getErrorMessage(action.payload)
       })
-      // Fetch movie by ID cases
-      .addCase(fetchMovieById.pending, (state) => {
+      // Fetch movie by documentId cases
+      .addCase(fetchMovieByDocumentId.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      .addCase(fetchMovieById.fulfilled, (state, action) => {
+      .addCase(fetchMovieByDocumentId.fulfilled, (state, action) => {
         state.loading = false
         state.currentMovie = action.payload
         state.error = null
       })
-      .addCase(fetchMovieById.rejected, (state, action) => {
+      .addCase(fetchMovieByDocumentId.rejected, (state, action) => {
         state.loading = false
         state.error = getErrorMessage(action.payload)
       })
@@ -137,40 +140,40 @@ const moviesSlice = createSlice({
         state.loading = false
         state.error = getErrorMessage(action.payload)
       })
-      // Update movie cases
-      .addCase(updateMovie.pending, (state) => {
+      // Update movie by documentId cases
+      .addCase(updateMovieByDocumentId.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      .addCase(updateMovie.fulfilled, (state, action) => {
+      .addCase(updateMovieByDocumentId.fulfilled, (state, action) => {
         state.loading = false
-        const index = state.movies.findIndex((movie) => movie.id === action.payload.id)
+        const index = state.movies.findIndex((movie) => movie.documentId === action.payload.documentId)
         if (index !== -1) {
           state.movies[index] = action.payload
         }
-        if (state.currentMovie?.id === action.payload.id) {
+        if (state.currentMovie?.documentId === action.payload.documentId) {
           state.currentMovie = action.payload
         }
         state.error = null
       })
-      .addCase(updateMovie.rejected, (state, action) => {
+      .addCase(updateMovieByDocumentId.rejected, (state, action) => {
         state.loading = false
         state.error = getErrorMessage(action.payload)
       })
-      // Delete movie cases
-      .addCase(deleteMovie.pending, (state) => {
+      // Delete movie by documentId cases
+      .addCase(deleteMovieByDocumentId.pending, (state) => {
         state.loading = true
         state.error = null
       })
-      .addCase(deleteMovie.fulfilled, (state, action) => {
+      .addCase(deleteMovieByDocumentId.fulfilled, (state, action) => {
         state.loading = false
-        state.movies = state.movies.filter((movie) => movie.id !== action.payload)
-        if (state.currentMovie?.id === action.payload) {
+        state.movies = state.movies.filter((movie) => movie.documentId !== action.payload)
+        if (state.currentMovie?.documentId === action.payload) {
           state.currentMovie = null
         }
         state.error = null
       })
-      .addCase(deleteMovie.rejected, (state, action) => {
+      .addCase(deleteMovieByDocumentId.rejected, (state, action) => {
         state.loading = false
         state.error = getErrorMessage(action.payload)
       })

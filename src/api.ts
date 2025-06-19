@@ -19,10 +19,10 @@ export {
 // Movies slice exports
 export {
   fetchMovies,
-  fetchMovieById,
+  fetchMovieByDocumentId,
   createMovie,
-  updateMovie,
-  deleteMovie,
+  updateMovieByDocumentId,
+  deleteMovieByDocumentId,
   clearError as clearMoviesError,
   clearCurrentMovie,
   setCurrentMovie,
