@@ -91,10 +91,6 @@ function Navbar() {
       case 'Profile':
         navigate('/profile')
         break
-      case 'Account':
-        navigate('/account')
-        // at the moment this will redirect to 404 page, as account page is not implemented yet
-        break
       case 'Dashboard':
         navigate('/dashboard')
         break
@@ -111,7 +107,6 @@ function Navbar() {
   // Create settings array based on user role
   const settings = [
     { label: 'Profile', action: 'Profile' },
-    { label: 'Account', action: 'Account' },
     ...(userIsAdmin ? [{ label: 'Dashboard', action: 'Dashboard' }] : []),
     { label: 'Logout', action: 'Logout' },
   ]
