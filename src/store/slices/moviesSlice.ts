@@ -44,7 +44,7 @@ export const fetchMovies = createAsyncThunk(
 
 export const fetchMovieByDocumentId = createAsyncThunk(
   'movies/fetchMovieByDocumentId',
-  async (params: { documentId: string; populate?: string }, { rejectWithValue }) => {
+  async (params: { documentId: string; populate?: string | string[] }, { rejectWithValue }) => {
     try {
       const response = await MoviesService.getMovieByDocumentId(params.documentId, params.populate)
       return response.data

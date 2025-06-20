@@ -1,4 +1,5 @@
 import type { Genre } from './genre'
+import type { Review } from './review'
 
 export interface Movie {
   id: number
@@ -13,4 +14,5 @@ export interface Movie {
   cover_image: string
   background_image: string
   genres?: Genre[]
+  reviews?: Review[]
 }
