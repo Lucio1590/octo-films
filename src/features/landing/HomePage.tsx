@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   Box,
   Typography,
@@ -11,15 +10,13 @@ import {
   CardContent,
   CardHeader,
   IconButton,
-  CssBaseline,
-  ThemeProvider,
   Button,
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import octoFilmsLogo from '/logo.svg'
-import { darkTheme, lightTheme } from '../../ui/themes'
+import { useTheme } from '../../ui/useTheme'
 import { Link } from 'react-router'
 
 const GradientBackground = styled(Box)({
@@ -59,11 +56,10 @@ const AnimatedLogo = styled('img')({
   },
 })
 
-const FeatureCard = styled(Card)(({ theme }) => ({
+const FeatureCard = styled(Card)({
   background: 'rgba(255,255,255,0.10)',
   borderRadius: 20,
   boxShadow: '0 4px 24px 0 rgba(31, 38, 135, 0.18)',
-  color: theme.palette.mode === 'dark' ? '#fff' : theme.palette.text.primary,
   minHeight: 220,
   display: 'flex',
   flexDirection: 'column',
@@ -74,20 +70,18 @@ const FeatureCard = styled(Card)(({ theme }) => ({
     transform: 'translateY(-8px) scale(1.03)',
     boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.28)',
   },
-}))
+})
 
 function HomePage() {
-  const [mode, setMode] = useState('dark')
-  const theme = mode === 'light' ? lightTheme : darkTheme
+  const { mode, toggleTheme } = useTheme()
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <>
       {/* Theme toggle button */}
       <Box sx={{ position: 'fixed', top: 24, right: 24, zIndex: 10 }}>
         <IconButton
           aria-label={mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-          onClick={() => setMode(mode === 'light' ? 'dark' : 'light')}
+          onClick={toggleTheme}
           color="secondary"
           size="large"
         >
@@ -187,18 +181,23 @@ function HomePage() {
                 tabIndex={0}
                 role="region"
                 aria-label="Discover Films"
-                sx={{ flex: 1, minWidth: 260, maxWidth: 360 }}
+                sx={{
+                  flex: 1,
+                  minWidth: 260,
+                  maxWidth: 360,
+                  color: mode === 'dark' ? '#fff' : '#333',
+                }}
               >
                 <CardHeader
                   title={
-                    <Typography variant="h6" sx={{ fontWeight: 700 }} color={theme.palette.secondary.main}>
+                    <Typography variant="h6" sx={{ fontWeight: 700 }} color="secondary.main">
                       Discover Films
                     </Typography>
                   }
                   sx={{
                     textAlign: 'center',
                     pb: 0,
-                    color: theme.palette.secondary.main,
+                    color: 'secondary.main',
                   }}
                 />
                 <CardContent>
@@ -212,18 +211,23 @@ function HomePage() {
                 tabIndex={0}
                 role="region"
                 aria-label="Review and Rate"
-                sx={{ flex: 1, minWidth: 260, maxWidth: 360 }}
+                sx={{
+                  flex: 1,
+                  minWidth: 260,
+                  maxWidth: 360,
+                  color: mode === 'dark' ? '#fff' : '#333',
+                }}
               >
                 <CardHeader
                   title={
-                    <Typography variant="h6" sx={{ fontWeight: 700 }} color={theme.palette.secondary.main}>
+                    <Typography variant="h6" sx={{ fontWeight: 700 }} color="secondary.main">
                       Review & Rate
                     </Typography>
                   }
                   sx={{
                     textAlign: 'center',
                     pb: 0,
-                    color: theme.palette.secondary.main,
+                    color: 'secondary.main',
                   }}
                 />
                 <CardContent>
@@ -236,18 +240,23 @@ function HomePage() {
                 tabIndex={0}
                 role="region"
                 aria-label="Personal Dashboard"
-                sx={{ flex: 1, minWidth: 260, maxWidth: 360 }}
+                sx={{
+                  flex: 1,
+                  minWidth: 260,
+                  maxWidth: 360,
+                  color: mode === 'dark' ? '#fff' : '#333',
+                }}
               >
                 <CardHeader
                   title={
-                    <Typography variant="h6" sx={{ fontWeight: 700 }} color={theme.palette.secondary.main}>
+                    <Typography variant="h6" sx={{ fontWeight: 700 }} color="secondary.main">
                       Personal Dashboard
                     </Typography>
                   }
                   sx={{
                     textAlign: 'center',
                     pb: 0,
-                    color: theme.palette.secondary.main,
+                    color: 'secondary.main',
                   }}
                 />
                 <CardContent>
@@ -306,7 +315,7 @@ function HomePage() {
           />
         </Box>
       </GradientBackground>
-    </ThemeProvider>
+    </>
   )
 }
 

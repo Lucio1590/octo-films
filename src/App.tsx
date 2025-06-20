@@ -1,9 +1,8 @@
-import { Box, Container, CssBaseline, styled, ThemeProvider, CircularProgress } from '@mui/material'
+import { Box, Container, CssBaseline, styled, CircularProgress } from '@mui/material'
 import { Outlet, ScrollRestoration, useLocation } from 'react-router'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import HomePage from './features/landing/HomePage'
 import Navbar from './ui/components/NavBar/Navbar'
-import { darkTheme, lightTheme } from './ui/themes'
 import { useAppDispatch, useAppSelector } from './hooks/redux'
 import { initializeAuth } from './store/slices/authSlice'
 
@@ -19,8 +18,6 @@ const StyledContainer = styled(Container)(({ theme }) => ({
 function App() {
   const location = useLocation()
   const dispatch = useAppDispatch()
-  const [mode] = useState('dark')
-  const theme = mode === 'light' ? lightTheme : darkTheme
 
   const { isAuthenticated } = useAppSelector((state) => state.auth)
 
@@ -46,41 +43,37 @@ function App() {
   // Show loading spinner during initial auth check
   if (!authInitialized) {
     return (
-      <ThemeProvider theme={theme}>
-        <StyledAppWrapper>
-          <CssBaseline />
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              minHeight: '100vh',
-            }}
-          >
-            <CircularProgress />
-          </Box>
-        </StyledAppWrapper>
-      </ThemeProvider>
+      <StyledAppWrapper>
+        <CssBaseline />
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '100vh',
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      </StyledAppWrapper>
     )
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <StyledAppWrapper>
-        <ScrollRestoration />
-        <CssBaseline />
-        {location.pathname === '/' ? (
-          <HomePage />
-        ) : (
-          <>
-            {showNavbar && <Navbar />}
-            <StyledContainer maxWidth="xl">
-              <Outlet />
-            </StyledContainer>
-          </>
-        )}
-      </StyledAppWrapper>
-    </ThemeProvider>
+    <StyledAppWrapper>
+      <ScrollRestoration />
+      <CssBaseline />
+      {location.pathname === '/' ? (
+        <HomePage />
+      ) : (
+        <>
+          {showNavbar && <Navbar />}
+          <StyledContainer maxWidth="xl">
+            <Outlet />
+          </StyledContainer>
+        </>
+      )}
+    </StyledAppWrapper>
   )
 }
 
