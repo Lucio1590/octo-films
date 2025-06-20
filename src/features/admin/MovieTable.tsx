@@ -14,6 +14,8 @@ import {
   Typography,
   Tooltip,
   Pagination,
+  Chip,
+  Stack,
 } from '@mui/material'
 import type { SelectChangeEvent } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
@@ -39,6 +41,7 @@ export default function MovieTable() {
         sort: sortString,
         pageSize: pageSize,
         page: currentPage,
+        populate: 'genres', // Include genres in the fetch
       }),
     )
   }, [dispatch, currentPage, sort])
@@ -110,6 +113,7 @@ export default function MovieTable() {
             <TableRow>
               <TableCell>Title</TableCell>
               <TableCell>Description</TableCell>
+              <TableCell>Genres</TableCell>
               <TableCell>Release Date</TableCell>
               <TableCell>Rating</TableCell>
               <TableCell>Actions</TableCell>
@@ -121,6 +125,25 @@ export default function MovieTable() {
                 <TableCell>{movie.title}</TableCell>
                 <TableCell>
                   {movie.description?.length > 60 ? movie.description.substring(0, 60) + '...' : movie.description}
+                </TableCell>
+                <TableCell>
+                  {movie.genres && movie.genres.length > 0 ? (
+                    <Stack direction="row" spacing={1} flexWrap="wrap" gap={0.5}>
+                      {movie.genres.map((genre) => (
+                        <Chip
+                          key={genre.documentId}
+                          label={genre.name}
+                          size="small"
+                          variant="outlined"
+                          color="primary"
+                        />
+                      ))}
+                    </Stack>
+                  ) : (
+                    <Typography variant="caption" color="text.secondary">
+                      No genres
+                    </Typography>
+                  )}
                 </TableCell>
                 <TableCell>{movie.release_date}</TableCell>
                 <TableCell>{movie.average_rating}</TableCell>
