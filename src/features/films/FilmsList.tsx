@@ -41,6 +41,7 @@ const FilmsList = () => {
         sort: sortString,
         pageSize: pageSize,
         page: currentPage,
+        populate: 'genres',
       }),
     )
   }, [dispatch, currentPage, sort])
