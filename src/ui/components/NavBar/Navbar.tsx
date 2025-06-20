@@ -16,6 +16,7 @@ import NavbarLogo from './NavbarLogo'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import { logoutUser } from '../../../store/slices/authSlice'
 import { isAdmin, getUserRole } from '../../../utils/auth'
+import { Shield } from '@mui/icons-material'
 
 const pages = ['Films', 'Films List', 'Genres']
 const adminPages = ['Dashboard', 'Create']
@@ -174,24 +175,55 @@ function Navbar() {
                 {page}
               </Button>
             ))}
-            {isAdmin(user) &&
-              adminPages.map((page) => (
-                <Button
-                  key={page}
-                  onClick={() => handleAdminPageClick(page)}
-                  sx={{
-                    my: 2,
-                    display: 'block',
-                    color: 'white',
-                    borderLeft: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: 0,
-                    ml: 1,
-                    pl: 2,
-                  }}
-                >
-                  {page}
-                </Button>
-              ))}
+            {isAdmin(user) && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  ml: 2,
+                  mr: 1,
+                  backgroundColor: 'grey.700',
+                  borderRadius: 1,
+                  pr: 3,
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', ml: 2, mr: 1 }}>
+                  <Typography
+                    variant="subtitle2"
+                    color="text.secondary"
+                    sx={{
+                      my: 2,
+                      display: 'block',
+                      fontWeight: 'bold',
+                      ml: 2,
+                      mr: 1,
+                      whiteSpace: 'pre-wrap',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {'ADMIN\nFUNCTIONALITIES'}
+                  </Typography>
+                  <Shield sx={{ color: 'white', verticalAlign: 'middle', mr: 1 }} />
+                </Box>
+
+                {adminPages.map((page) => (
+                  <Button
+                    key={page}
+                    onClick={() => handleAdminPageClick(page)}
+                    sx={{
+                      my: 2,
+                      display: 'block',
+                      color: 'white',
+                      borderRadius: 0,
+                      ml: 1,
+                      pl: 2,
+                    }}
+                  >
+                    {page}
+                  </Button>
+                ))}
+              </Box>
+            )}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
