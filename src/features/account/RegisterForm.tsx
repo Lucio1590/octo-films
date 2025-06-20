@@ -37,6 +37,9 @@ export default function RegisterForm() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
+  // Check if we're in development mode
+  const isDevMode = import.meta.env.VITE_DEV_MODE === 'true'
+
   const { loading, error, isAuthenticated } = useAppSelector((state) => state.auth)
 
   const {
@@ -62,6 +65,12 @@ export default function RegisterForm() {
   }, [isAuthenticated, navigate])
 
   const onSubmit = async (data: RegisterFormData) => {
+    // Only allow registration in development mode
+    if (!isDevMode) {
+      console.log('Registration is disabled in production mode')
+      return
+    }
+
     try {
       // Remove confirmPassword before sending to API
       const registrationData = {
@@ -103,14 +112,26 @@ export default function RegisterForm() {
           Join us to discover amazing films
         </Typography>
 
-        <Alert severity="info" sx={{ mb: 3 }}>
-          <Typography variant="body2">
-            <strong>Registration Temporarily Disabled</strong>
-            <br />
-            Account registration is currently locked off for security reasons. Please contact an administrator if you
-            need access to the platform. The form below is available for testing validation functionality.
-          </Typography>
-        </Alert>
+        {!isDevMode && (
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <Typography variant="body2">
+              <strong>Registration Temporarily Disabled</strong>
+              <br />
+              Account registration is currently locked off for security reasons. Please contact an administrator if you
+              need access to the platform. The form below is available for testing validation functionality.
+            </Typography>
+          </Alert>
+        )}
+
+        {isDevMode && (
+          <Alert severity="success" sx={{ mb: 3 }}>
+            <Typography variant="body2">
+              <strong>Development Mode</strong>
+              <br />
+              Registration is enabled in development mode. You can create new accounts for testing purposes.
+            </Typography>
+          </Alert>
+        )}
 
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -173,7 +194,7 @@ export default function RegisterForm() {
             fullWidth
             variant="contained"
             size="large"
-            disabled={loading || !isValid}
+            disabled={loading || !isValid || !isDevMode}
             sx={{ mt: 3, mb: 2 }}
           >
             {loading ? (
@@ -181,6 +202,8 @@ export default function RegisterForm() {
                 <CircularProgress size={20} sx={{ mr: 1 }} />
                 Creating Account...
               </>
+            ) : isDevMode ? (
+              'Create Account'
             ) : (
               'Test Validation (Registration Disabled)'
             )}
