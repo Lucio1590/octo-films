@@ -119,9 +119,29 @@ export default function FilmCard({ movie, onClick }: FilmCardProps) {
             />
           </Box>
 
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-            Updated: {new Date(movie.updatedAt).toLocaleDateString()}
-          </Typography>
+          {movie.genres && movie.genres.length > 0 && (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
+              {movie.genres.slice(0, 3).map((genre) => (
+                <Chip
+                  key={genre.documentId}
+                  label={genre.name}
+                  size="small"
+                  variant="outlined"
+                  color="secondary"
+                  sx={{ fontSize: '0.75rem', height: '20px' }}
+                />
+              ))}
+              {movie.genres.length > 3 && (
+                <Chip
+                  label={`+${movie.genres.length - 3}`}
+                  size="small"
+                  variant="outlined"
+                  color="default"
+                  sx={{ fontSize: '0.75rem', height: '20px' }}
+                />
+              )}
+            </Box>
+          )}
         </CardContent>
       </CardActionArea>
     </StyledMovieCard>

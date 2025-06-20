@@ -5,5 +5,7 @@ export * from './userAuthTypes'
 // Movie types
 export * from './movie'
 export * from './tmdb'
+// Genre types
+export * from './genre'
 // Redux state types
 export * from './redux'

@@ -1,11 +1,14 @@
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Box, Button, TextField, Alert, Stack } from '@mui/material'
+import { Box, Button, TextField, Alert, Stack, Autocomplete, Chip } from '@mui/material'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { createMovie, updateMovieByDocumentId, fetchMovieByDocumentId } from '../../store/slices/moviesSlice'
+import { fetchGenres } from '../../store/slices/genresSlice'
 import { useNavigate, useParams } from 'react-router'
 import { useState, useEffect } from 'react'
+import type { Genre } from '../../core/types/genre'
+import type { Movie } from '../../core/types/movie'
 
 const movieSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -14,15 +17,34 @@ const movieSchema = z.object({
   average_rating: z.number().min(0).max(10),
   cover_image: z.string().url('Cover image must be a valid URL').or(z.literal('')).optional(),
   background_image: z.string().url('Background image must be a valid URL').or(z.literal('')).optional(),
+  genres: z
+    .array(
+      z.object({
+        id: z.number(),
+        documentId: z.string(),
+        name: z.string(),
+        slug: z.string(),
+        createdAt: z.string(),
+        updatedAt: z.string(),
+        publishedAt: z.string(),
+      }),
+    )
+    .optional(),
 })
 
 type MovieFormData = z.infer<typeof movieSchema>
+
+// Type for API payload where genres are just documentId strings
+type MovieCreateUpdateData = Omit<MovieFormData, 'genres'> & {
+  genres?: string[]
+}
 
 export default function MovieForm() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const { loading, error, currentMovie } = useAppSelector((state) => state.movies)
+  const { genres } = useAppSelector((state) => state.genres)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const isEditMode = Boolean(id)
@@ -34,18 +56,25 @@ export default function MovieForm() {
     formState: { errors, isValid },
     reset,
     setValue,
+    control,
   } = useForm<MovieFormData>({
     resolver: zodResolver(movieSchema),
     mode: 'onChange',
     defaultValues: {
       average_rating: 0,
+      genres: [],
     },
   })
+
+  // Load genres for the multiselect
+  useEffect(() => {
+    dispatch(fetchGenres({ sort: 'name:asc', pageSize: 100, page: 1 }))
+  }, [dispatch])
 
   // Load movie data for editing
   useEffect(() => {
     if (isEditMode && documentId) {
-      dispatch(fetchMovieByDocumentId({ documentId }))
+      dispatch(fetchMovieByDocumentId({ documentId, populate: 'genres' }))
     }
   }, [dispatch, isEditMode, documentId])
 
@@ -58,16 +87,23 @@ export default function MovieForm() {
       setValue('average_rating', currentMovie.average_rating)
       setValue('cover_image', currentMovie.cover_image || '')
       setValue('background_image', currentMovie.background_image || '')
+      setValue('genres', currentMovie.genres || [])
     }
   }, [isEditMode, currentMovie, setValue])
 
   const onSubmit = async (data: MovieFormData) => {
     setSubmitError(null)
     try {
+      // Transform genres to only include documentIds for the API
+      const transformedData: MovieCreateUpdateData = {
+        ...data,
+        genres: data.genres?.map((genre) => genre.documentId) || [],
+      }
+
       if (isEditMode && documentId) {
-        await dispatch(updateMovieByDocumentId({ documentId, data })).unwrap()
+        await dispatch(updateMovieByDocumentId({ documentId, data: transformedData as Partial<Movie> })).unwrap()
       } else {
-        await dispatch(createMovie(data)).unwrap()
+        await dispatch(createMovie(transformedData as Partial<Movie>)).unwrap()
       }
       reset()
       navigate('/dashboard')
@@ -125,6 +161,35 @@ export default function MovieForm() {
           error={!!errors.background_image}
           helperText={errors.background_image?.message}
           fullWidth
+        />
+        <Controller
+          name="genres"
+          control={control}
+          render={({ field: { onChange, value, ...field } }) => (
+            <Autocomplete
+              {...field}
+              multiple
+              options={genres}
+              value={value || []}
+              onChange={(_, newValue) => onChange(newValue)}
+              getOptionLabel={(option: Genre) => option.name}
+              isOptionEqualToValue={(option: Genre, value: Genre) => option.documentId === value.documentId}
+              renderTags={(value: Genre[], getTagProps) =>
+                value.map((option: Genre, index: number) => (
+                  <Chip variant="outlined" label={option.name} {...getTagProps({ index })} key={option.documentId} />
+                ))
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Genres"
+                  placeholder="Select genres..."
+                  error={!!errors.genres}
+                  helperText={errors.genres?.message}
+                />
+              )}
+            />
+          )}
         />
         {submitError && <Alert severity="error">{submitError}</Alert>}
         {error && (

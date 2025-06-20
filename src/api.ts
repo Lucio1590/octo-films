@@ -33,8 +33,26 @@ export {
   clearImportProgress,
 } from './store/slices/moviesSlice'
 
+// Genres slice exports
+export {
+  fetchGenres,
+  fetchGenreByDocumentId,
+  createGenre,
+  updateGenreByDocumentId,
+  deleteGenreByDocumentId,
+  importGenresFromJSON,
+  clearGenresError,
+  clearCurrentGenre,
+  setCurrentGenre,
+  updateGenreImportProgress,
+  startGenreImport,
+  finishGenreImport,
+  clearGenreImportProgress,
+  setGenresSortOptions,
+} from './store/slices/genresSlice'
+
 // Services
-export { AuthService, MoviesService } from './services'
+export { AuthService, MoviesService, GenresService } from './services'
 
 // Types
 
