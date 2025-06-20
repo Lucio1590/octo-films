@@ -87,9 +87,18 @@ export default function LoginForm() {
         <Typography variant="h4" component="h1" gutterBottom align="center">
           Welcome Back
         </Typography>
-        <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
+        <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 2 }}>
           Sign in to your account
         </Typography>
+
+        <Alert severity="info" sx={{ mb: 3 }}>
+          <Typography variant="body2">
+            <strong>Server Status Notice</strong>
+            <br />
+            If login times out or takes longer than usual, the backend server may be sleeping. Please wait 1-2 minutes
+            for the server to wake up and try again.
+          </Typography>
+        </Alert>
 
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>

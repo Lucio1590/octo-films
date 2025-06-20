@@ -86,7 +86,7 @@ export default function FilmsHome() {
 
       {remaining.length > 0 && (
         <>
-          <Typography variant="h5" sx={{ mb: 3, textAlign: 'center' }}>
+          <Typography variant="h5" sx={{ my: 3, textAlign: 'center' }}>
             More Great Movies
           </Typography>
           <MoviesGrid>

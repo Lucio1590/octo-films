@@ -11,12 +11,13 @@ import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
 import Tooltip from '@mui/material/Tooltip'
 import MenuItem from '@mui/material/MenuItem'
+import { LightMode, DarkMode, Shield } from '@mui/icons-material'
 import { useNavigate } from 'react-router'
 import NavbarLogo from './NavbarLogo'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import { logoutUser } from '../../../store/slices/authSlice'
 import { isAdmin, getUserRole } from '../../../utils/auth'
-import { Shield } from '@mui/icons-material'
+import { useTheme } from '../../useTheme'
 
 const pages = ['Films', 'Films List', 'Genres']
 const adminPages = ['Dashboard', 'Create']
@@ -25,6 +26,7 @@ function Navbar() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { user, loading } = useAppSelector((state) => state.auth)
+  const { mode, toggleTheme } = useTheme()
 
   // Safely check if user is admin, ensuring we have complete user data
   const userIsAdmin = React.useMemo(() => {
@@ -91,10 +93,6 @@ function Navbar() {
       case 'Profile':
         navigate('/profile')
         break
-      case 'Account':
-        navigate('/account')
-        // at the moment this will redirect to 404 page, as account page is not implemented yet
-        break
       case 'Dashboard':
         navigate('/dashboard')
         break
@@ -111,7 +109,6 @@ function Navbar() {
   // Create settings array based on user role
   const settings = [
     { label: 'Profile', action: 'Profile' },
-    { label: 'Account', action: 'Account' },
     ...(userIsAdmin ? [{ label: 'Dashboard', action: 'Dashboard' }] : []),
     { label: 'Logout', action: 'Logout' },
   ]
@@ -176,7 +173,7 @@ function Navbar() {
           <NavbarLogo isMobile />
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
-              <Button key={page} onClick={() => handlePageClick(page)} sx={{ my: 2, display: 'block', color: 'white' }}>
+              <Button key={page} onClick={() => handlePageClick(page)} sx={{ my: 2, display: 'block' }}>
                 {page}
               </Button>
             ))}
@@ -187,7 +184,7 @@ function Navbar() {
                   alignItems: 'center',
                   ml: 2,
                   mr: 1,
-                  backgroundColor: 'grey.700',
+                  backgroundColor: mode === 'light' ? 'rgba(26, 35, 126, 0.08)' : 'grey.700',
                   borderRadius: 1,
                   pr: 3,
                 }}
@@ -195,7 +192,6 @@ function Navbar() {
                 <Box sx={{ display: 'flex', alignItems: 'center', ml: 2, mr: 1 }}>
                   <Typography
                     variant="subtitle2"
-                    color="text.secondary"
                     sx={{
                       my: 2,
                       display: 'block',
@@ -204,11 +200,12 @@ function Navbar() {
                       mr: 1,
                       whiteSpace: 'pre-wrap',
                       textAlign: 'center',
+                      color: mode === 'light' ? 'primary.main' : 'text.secondary',
                     }}
                   >
                     {'ADMIN\nFUNCTIONALITIES'}
                   </Typography>
-                  <Shield sx={{ color: 'white', verticalAlign: 'middle', mr: 1 }} />
+                  <Shield sx={{ color: mode === 'light' ? 'primary.main' : 'white', verticalAlign: 'middle', mr: 1 }} />
                 </Box>
 
                 {adminPages.map((page) => (
@@ -218,10 +215,13 @@ function Navbar() {
                     sx={{
                       my: 2,
                       display: 'block',
-                      color: 'white',
+                      color: mode === 'light' ? 'primary.main' : 'white',
                       borderRadius: 0,
                       ml: 1,
                       pl: 2,
+                      '&:hover': {
+                        backgroundColor: mode === 'light' ? 'rgba(26, 35, 126, 0.08)' : 'rgba(255, 255, 255, 0.08)',
+                      },
                     }}
                   >
                     {page}
@@ -230,7 +230,24 @@ function Navbar() {
               </Box>
             )}
           </Box>
-          <Box sx={{ flexGrow: 0 }}>
+          <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* Theme Toggle Button */}
+            <Tooltip title={mode === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}>
+              <IconButton
+                onClick={toggleTheme}
+                color="inherit"
+                sx={{
+                  color: mode === 'light' ? 'primary.main' : 'white',
+                  '&:hover': {
+                    backgroundColor: mode === 'light' ? 'rgba(26, 35, 126, 0.08)' : 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
+              >
+                {mode === 'light' ? <DarkMode /> : <LightMode />}
+              </IconButton>
+            </Tooltip>
+
+            {/* User Avatar and Menu */}
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt={user?.username || 'User'} sx={{ bgcolor: 'secondary.main' }}>
