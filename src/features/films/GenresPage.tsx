@@ -77,44 +77,45 @@ export default function GenresPage() {
         </Typography>
       </Box>
 
-      {genresWithTopMovies.map((genre) => (
-        <GenreSection key={genre.documentId} elevation={2}>
-          <GenreHeader>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Typography variant="h4" component="h2" sx={{ fontWeight: 600 }}>
-                {genre.name}
-              </Typography>
-              <Chip
-                label={genre.slug}
-                size="small"
-                variant="outlined"
-                color="primary"
-                sx={{ fontFamily: 'monospace' }}
-              />
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Star sx={{ color: 'warning.main', fontSize: 20 }} />
-              <Typography variant="body2" color="text.secondary">
-                Top Rated
-              </Typography>
-            </Box>
-          </GenreHeader>
+      {genresWithTopMovies &&
+        genresWithTopMovies.map((genre) => (
+          <GenreSection key={genre.documentId} elevation={2}>
+            <GenreHeader>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Typography variant="h4" component="h2" sx={{ fontWeight: 600 }}>
+                  {genre.name}
+                </Typography>
+                <Chip
+                  label={genre.slug}
+                  size="small"
+                  variant="outlined"
+                  color="primary"
+                  sx={{ fontFamily: 'monospace' }}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Star sx={{ color: 'warning.main', fontSize: 20 }} />
+                <Typography variant="body2" color="text.secondary">
+                  Top Rated
+                </Typography>
+              </Box>
+            </GenreHeader>
 
-          {genre.topMovies.length > 0 ? (
-            <MoviesGrid>
-              {genre.topMovies.map((movie) => (
-                <FilmCard key={movie.documentId} movie={movie} onClick={() => handleMovieClick(movie.documentId)} />
-              ))}
-            </MoviesGrid>
-          ) : (
-            <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
-              No movies found for this genre yet.
-            </Typography>
-          )}
-        </GenreSection>
-      ))}
+            {genre.movies.length > 0 ? (
+              <MoviesGrid>
+                {genre.movies.map((movie) => (
+                  <FilmCard key={movie.documentId} movie={movie} onClick={() => handleMovieClick(movie.documentId)} />
+                ))}
+              </MoviesGrid>
+            ) : (
+              <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                No movies found for this genre yet.
+              </Typography>
+            )}
+          </GenreSection>
+        ))}
 
-      {genresWithTopMovies.length === 0 && (
+      {(!genresWithTopMovies || genresWithTopMovies.length === 0) && (
         <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 8 }}>
           No genres with movies found.
         </Typography>

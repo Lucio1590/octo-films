@@ -14,7 +14,7 @@ export interface GenresResponse {
 }
 
 export interface GenreWithTopMovies extends Genre {
-  topMovies: Array<{
+  movies: Array<{
     id: number
     documentId: string
     title: string
@@ -31,14 +31,6 @@ export interface GenreWithTopMovies extends Genre {
 
 export interface GenresWithTopMoviesResponse {
   data: GenreWithTopMovies[]
-  meta: {
-    pagination: {
-      page: number
-      pageSize: number
-      pageCount: number
-      total: number
-    }
-  }
 }
 
 /**
@@ -144,6 +136,8 @@ export class GenresService {
    * Fetches genres with their top movies by rating.
    */
   static async getGenresWithTopMovies(): Promise<GenresWithTopMoviesResponse> {
-    return apiClient.get<GenresWithTopMoviesResponse>('/api/genres-with-top-movies')
+    const response = await apiClient.get<GenreWithTopMovies[]>('/api/genres-with-top-movies')
+    // The API returns an array directly, so we wrap it in the expected format
+    return { data: response }
   }
 }

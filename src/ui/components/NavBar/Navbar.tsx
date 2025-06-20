@@ -17,7 +17,8 @@ import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import { logoutUser } from '../../../store/slices/authSlice'
 import { isAdmin, getUserRole } from '../../../utils/auth'
 
-const pages = ['Films', 'Series', 'Reviews', 'Lists', 'Members', 'Stats']
+const pages = ['Films', 'Films List', 'Genres']
+const adminPages = ['Dashboard', 'Create']
 
 function Navbar() {
   const dispatch = useAppDispatch()
@@ -46,20 +47,27 @@ function Navbar() {
       case 'Films':
         navigate('/films')
         break
-      case 'Series':
-        // TODO: Implement series page
+      case 'Films List':
+        navigate('/films/list')
         break
-      case 'Reviews':
-        // TODO: Implement reviews page
+      case 'Genres':
+        navigate('/genres')
         break
-      case 'Lists':
-        // TODO: Implement lists page
+      default:
         break
-      case 'Members':
-        // TODO: Implement members page
+    }
+  }
+
+  const handleAdminPageClick = (page: string) => {
+    handleCloseNavMenu()
+
+    switch (page) {
+      case 'Dashboard':
+        navigate('/dashboard')
         break
-      case 'Stats':
-        // TODO: Implement stats page
+      case 'Create':
+        // Navigate to create film page
+        navigate('/create-film')
         break
       default:
         break
@@ -139,6 +147,24 @@ function Navbar() {
                   <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
                 </MenuItem>
               ))}
+              {isAdmin(user) && (
+                <>
+                  <MenuItem disabled>
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ textAlign: 'center', fontWeight: 'bold' }}
+                    >
+                      ADMIN
+                    </Typography>
+                  </MenuItem>
+                  {adminPages.map((page) => (
+                    <MenuItem key={page} onClick={() => handleAdminPageClick(page)}>
+                      <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
+                    </MenuItem>
+                  ))}
+                </>
+              )}
             </Menu>
           </Box>
           <NavbarLogo isMobile />
@@ -148,6 +174,24 @@ function Navbar() {
                 {page}
               </Button>
             ))}
+            {isAdmin(user) &&
+              adminPages.map((page) => (
+                <Button
+                  key={page}
+                  onClick={() => handleAdminPageClick(page)}
+                  sx={{
+                    my: 2,
+                    display: 'block',
+                    color: 'white',
+                    borderLeft: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: 0,
+                    ml: 1,
+                    pl: 2,
+                  }}
+                >
+                  {page}
+                </Button>
+              ))}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
