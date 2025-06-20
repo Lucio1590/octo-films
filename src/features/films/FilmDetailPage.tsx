@@ -12,7 +12,7 @@ import {
   IconButton,
   styled,
 } from '@mui/material'
-import { ArrowBack, CalendarToday, Star, Edit } from '@mui/icons-material'
+import { ArrowBack, CalendarToday, Star, Edit, Person } from '@mui/icons-material'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { fetchMovieByDocumentId, clearCurrentMovie } from '../../store/slices/moviesSlice'
 import { isAdmin } from '../../utils/auth'
@@ -77,7 +77,7 @@ export default function FilmDetailPage() {
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchMovieByDocumentId({ documentId: id, populate: 'genres' }))
+      dispatch(fetchMovieByDocumentId({ documentId: id, populate: ['genres', 'reviews'] }))
     }
 
     // Clean up when component unmounts
@@ -299,6 +299,64 @@ export default function FilmDetailPage() {
           </Box>
         </Paper>
       </Box>
+
+      {/* Reviews Section */}
+      {currentMovie.reviews && currentMovie.reviews.length > 0 && (
+        <Box sx={{ py: 4, px: { xs: 2, md: 4 } }}>
+          <Paper sx={{ p: 4 }}>
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
+              Reviews ({currentMovie.reviews.length})
+            </Typography>
+            <Box sx={{ mt: 3 }}>
+              {currentMovie.reviews.map((review) => (
+                <Paper
+                  key={review.documentId}
+                  elevation={1}
+                  sx={{
+                    p: 3,
+                    mb: 2,
+                    borderLeft: '4px solid',
+                    borderLeftColor: 'primary.main',
+                  }}
+                >
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Person sx={{ color: 'text.secondary' }} />
+                      <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                        {review.username || 'Anonymous User'}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Rating value={review.rating / 2} precision={0.1} size="small" readOnly />
+                      <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                        {review.rating.toFixed(1)}/10
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {review.title && (
+                    <Typography variant="h6" sx={{ mb: 1, fontWeight: 'bold' }}>
+                      {review.title}
+                    </Typography>
+                  )}
+
+                  <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
+                    {review.body}
+                  </Typography>
+
+                  <Typography variant="caption" color="text.secondary">
+                    {new Date(review.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </Typography>
+                </Paper>
+              ))}
+            </Box>
+          </Paper>
+        </Box>
+      )}
     </Box>
   )
 }
