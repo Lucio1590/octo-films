@@ -18,6 +18,7 @@ import {
 import type { SelectChangeEvent } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { fetchMovies, deleteMovieByDocumentId, setSortOptions } from '../../store/slices/moviesSlice'
 import { useNavigate } from 'react-router'
@@ -60,6 +61,10 @@ export default function MovieTable() {
 
   const handleEdit = (movie: { id: number; documentId: string }) => {
     navigate(`/manage/${movie.documentId}`)
+  }
+
+  const handleView = (movie: { id: number; documentId: string }) => {
+    navigate(`/films/${movie.documentId}`)
   }
 
   const handleDelete = (movie: { id: number; documentId: string }) => {
@@ -120,6 +125,11 @@ export default function MovieTable() {
                 <TableCell>{movie.release_date}</TableCell>
                 <TableCell>{movie.average_rating}</TableCell>
                 <TableCell>
+                  <Tooltip title="View">
+                    <IconButton color="info" onClick={() => handleView(movie)}>
+                      <VisibilityIcon />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title="Edit">
                     <IconButton color="primary" onClick={() => handleEdit(movie)}>
                       <EditIcon />

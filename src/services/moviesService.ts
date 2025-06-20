@@ -58,13 +58,18 @@ export class MoviesService {
    * Fetches a single movie by its documentId.
    * Supports 'populate' parameter to include related entities.
    * @param documentId - The documentId of the movie to fetch.
-   * @param populate - Optional populate parameter for Strapi.
+   * @param populate - Optional populate parameter(s) for Strapi. Can be a string or array of strings.
    */
-  static async getMovieByDocumentId(documentId: string, populate?: string): Promise<{ data: Movie }> {
+  static async getMovieByDocumentId(documentId: string, populate?: string | string[]): Promise<{ data: Movie }> {
     const searchParams = new URLSearchParams()
 
     if (populate) {
-      searchParams.append('populate', populate)
+      if (Array.isArray(populate)) {
+        // Add multiple populate parameters
+        populate.forEach((field) => searchParams.append('populate', field))
+      } else {
+        searchParams.append('populate', populate)
+      }
     }
 
     const queryString = searchParams.toString()

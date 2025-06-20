@@ -16,6 +16,7 @@ import NavbarLogo from './NavbarLogo'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import { logoutUser } from '../../../store/slices/authSlice'
 import { isAdmin, getUserRole } from '../../../utils/auth'
+import { Shield } from '@mui/icons-material'
 
 const pages = ['Films', 'Films List', 'Genres']
 const adminPages = ['Dashboard', 'Create']
@@ -23,7 +24,12 @@ const adminPages = ['Dashboard', 'Create']
 function Navbar() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const { user } = useAppSelector((state) => state.auth)
+  const { user, loading } = useAppSelector((state) => state.auth)
+
+  // Safely check if user is admin, ensuring we have complete user data
+  const userIsAdmin = React.useMemo(() => {
+    return !loading && user && isAdmin(user)
+  }, [user, loading])
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null)
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null)
@@ -106,7 +112,7 @@ function Navbar() {
   const settings = [
     { label: 'Profile', action: 'Profile' },
     { label: 'Account', action: 'Account' },
-    ...(isAdmin(user) ? [{ label: 'Dashboard', action: 'Dashboard' }] : []),
+    ...(userIsAdmin ? [{ label: 'Dashboard', action: 'Dashboard' }] : []),
     { label: 'Logout', action: 'Logout' },
   ]
 
@@ -147,7 +153,7 @@ function Navbar() {
                   <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
                 </MenuItem>
               ))}
-              {isAdmin(user) && (
+              {userIsAdmin && (
                 <>
                   <MenuItem disabled>
                     <Typography
@@ -174,24 +180,55 @@ function Navbar() {
                 {page}
               </Button>
             ))}
-            {isAdmin(user) &&
-              adminPages.map((page) => (
-                <Button
-                  key={page}
-                  onClick={() => handleAdminPageClick(page)}
-                  sx={{
-                    my: 2,
-                    display: 'block',
-                    color: 'white',
-                    borderLeft: '1px solid rgba(255, 255, 255, 0.2)',
-                    borderRadius: 0,
-                    ml: 1,
-                    pl: 2,
-                  }}
-                >
-                  {page}
-                </Button>
-              ))}
+            {userIsAdmin && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  ml: 2,
+                  mr: 1,
+                  backgroundColor: 'grey.700',
+                  borderRadius: 1,
+                  pr: 3,
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', ml: 2, mr: 1 }}>
+                  <Typography
+                    variant="subtitle2"
+                    color="text.secondary"
+                    sx={{
+                      my: 2,
+                      display: 'block',
+                      fontWeight: 'bold',
+                      ml: 2,
+                      mr: 1,
+                      whiteSpace: 'pre-wrap',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {'ADMIN\nFUNCTIONALITIES'}
+                  </Typography>
+                  <Shield sx={{ color: 'white', verticalAlign: 'middle', mr: 1 }} />
+                </Box>
+
+                {adminPages.map((page) => (
+                  <Button
+                    key={page}
+                    onClick={() => handleAdminPageClick(page)}
+                    sx={{
+                      my: 2,
+                      display: 'block',
+                      color: 'white',
+                      borderRadius: 0,
+                      ml: 1,
+                      pl: 2,
+                    }}
+                  >
+                    {page}
+                  </Button>
+                ))}
+              </Box>
+            )}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
