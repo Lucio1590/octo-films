@@ -99,9 +99,18 @@ export default function RegisterForm() {
         <Typography variant="h4" component="h1" gutterBottom align="center">
           Create Account
         </Typography>
-        <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
+        <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 2 }}>
           Join us to discover amazing films
         </Typography>
+
+        <Alert severity="info" sx={{ mb: 3 }}>
+          <Typography variant="body2">
+            <strong>Registration Temporarily Disabled</strong>
+            <br />
+            Account registration is currently locked off for security reasons. Please contact an administrator if you
+            need access to the platform. The form below is available for testing validation functionality.
+          </Typography>
+        </Alert>
 
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -173,7 +182,7 @@ export default function RegisterForm() {
                 Creating Account...
               </>
             ) : (
-              'Create Account'
+              'Test Validation (Registration Disabled)'
             )}
           </Button>
 
