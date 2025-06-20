@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link as RouterLink, useNavigate, useLocation } from 'react-router'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
-import { loginUser, clearError } from '../../store/slices/authSlice'
+import { loginUser, clearError, getCurrentUser } from '../../store/slices/authSlice'
 
 // Zod validation schema
 const loginSchema = z.object({
@@ -56,6 +56,8 @@ export default function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await dispatch(loginUser(data)).unwrap()
+      // Fetch current user with role information after successful login
+      await dispatch(getCurrentUser()).unwrap()
       reset()
       navigate(from, { replace: true })
     } catch (error) {

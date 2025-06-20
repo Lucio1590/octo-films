@@ -24,7 +24,12 @@ const adminPages = ['Dashboard', 'Create']
 function Navbar() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const { user } = useAppSelector((state) => state.auth)
+  const { user, loading } = useAppSelector((state) => state.auth)
+
+  // Safely check if user is admin, ensuring we have complete user data
+  const userIsAdmin = React.useMemo(() => {
+    return !loading && user && isAdmin(user)
+  }, [user, loading])
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null)
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null)
@@ -107,7 +112,7 @@ function Navbar() {
   const settings = [
     { label: 'Profile', action: 'Profile' },
     { label: 'Account', action: 'Account' },
-    ...(isAdmin(user) ? [{ label: 'Dashboard', action: 'Dashboard' }] : []),
+    ...(userIsAdmin ? [{ label: 'Dashboard', action: 'Dashboard' }] : []),
     { label: 'Logout', action: 'Logout' },
   ]
 
@@ -148,7 +153,7 @@ function Navbar() {
                   <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
                 </MenuItem>
               ))}
-              {isAdmin(user) && (
+              {userIsAdmin && (
                 <>
                   <MenuItem disabled>
                     <Typography
@@ -175,7 +180,7 @@ function Navbar() {
                 {page}
               </Button>
             ))}
-            {isAdmin(user) && (
+            {userIsAdmin && (
               <Box
                 sx={{
                   display: 'flex',
