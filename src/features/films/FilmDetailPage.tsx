@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router'
 import {
   Box,
@@ -10,11 +10,13 @@ import {
   Rating,
   Button,
   IconButton,
+  TextField,
   styled,
 } from '@mui/material'
-import { ArrowBack, CalendarToday, Star, Edit, Person } from '@mui/icons-material'
+import { ArrowBack, CalendarToday, Star, Edit, Person, Add } from '@mui/icons-material'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { fetchMovieByDocumentId, clearCurrentMovie } from '../../store/slices/moviesSlice'
+import { ReviewsService } from '../../services/reviewsService'
 import { isAdmin } from '../../utils/auth'
 
 const HeroSection = styled(Box)(() => ({
@@ -75,6 +77,13 @@ export default function FilmDetailPage() {
   const { currentMovie, loading, error } = useAppSelector((state) => state.movies)
   const { user } = useAppSelector((state) => state.auth)
 
+  // Review form state
+  const [showReviewForm, setShowReviewForm] = useState(false)
+  const [reviewTitle, setReviewTitle] = useState('')
+  const [reviewBody, setReviewBody] = useState('')
+  const [reviewRating, setReviewRating] = useState<number>(5)
+  const [reviewSubmitting, setReviewSubmitting] = useState(false)
+
   useEffect(() => {
     if (id) {
       dispatch(fetchMovieByDocumentId({ documentId: id, populate: ['genres', 'reviews'] }))
@@ -93,6 +102,37 @@ export default function FilmDetailPage() {
   const handleEdit = () => {
     if (currentMovie) {
       navigate(`/manage/${currentMovie.documentId}`)
+    }
+  }
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!user || !id) return
+
+    setReviewSubmitting(true)
+
+    try {
+      await ReviewsService.createReview({
+        title: reviewTitle,
+        body: reviewBody,
+        rating: reviewRating,
+        username: user.username,
+        movie: id,
+      })
+
+      // Reset form
+      setReviewTitle('')
+      setReviewBody('')
+      setReviewRating(5)
+      setShowReviewForm(false)
+
+      // Refetch movie details to include the new review
+      dispatch(fetchMovieByDocumentId({ documentId: id, populate: ['genres', 'reviews'] }))
+    } catch (error) {
+      console.error('Failed to submit review:', error)
+    } finally {
+      setReviewSubmitting(false)
     }
   }
 
@@ -301,12 +341,91 @@ export default function FilmDetailPage() {
       </Box>
 
       {/* Reviews Section */}
-      {currentMovie.reviews && currentMovie.reviews.length > 0 && (
-        <Box sx={{ py: 4, px: { xs: 2, md: 4 } }}>
-          <Paper sx={{ p: 4 }}>
-            <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
-              Reviews ({currentMovie.reviews.length})
+      <Box sx={{ py: 4, px: { xs: 2, md: 4 } }}>
+        <Paper sx={{ p: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+              Reviews ({currentMovie.reviews ? currentMovie.reviews.length : 0})
             </Typography>
+            {user && (
+              <Button
+                variant="contained"
+                startIcon={<Add />}
+                onClick={() => setShowReviewForm(!showReviewForm)}
+                disabled={reviewSubmitting}
+              >
+                {showReviewForm ? 'Cancel' : 'Write Review'}
+              </Button>
+            )}
+          </Box>
+
+          {/* Review Form */}
+          {showReviewForm && user && (
+            <Paper
+              elevation={2}
+              sx={{
+                p: 3,
+                mb: 3,
+                border: '2px solid',
+                borderColor: 'primary.main',
+                borderRadius: 2,
+              }}
+            >
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+                Write a Review
+              </Typography>
+              <Box component="form" onSubmit={handleReviewSubmit}>
+                <TextField
+                  fullWidth
+                  label="Review Title"
+                  value={reviewTitle}
+                  onChange={(e) => setReviewTitle(e.target.value)}
+                  sx={{ mb: 2 }}
+                  required
+                />
+                <TextField
+                  fullWidth
+                  label="Your Review"
+                  value={reviewBody}
+                  onChange={(e) => setReviewBody(e.target.value)}
+                  multiline
+                  rows={4}
+                  sx={{ mb: 2 }}
+                  required
+                />
+                <Box sx={{ mb: 2 }}>
+                  <Typography component="legend" gutterBottom>
+                    Rating (out of 10)
+                  </Typography>
+                  <Rating
+                    value={reviewRating / 2}
+                    precision={0.5}
+                    size="large"
+                    onChange={(_, newValue) => setReviewRating((newValue || 0) * 2)}
+                    sx={{ mb: 2 }}
+                  />
+                  <Typography variant="body2" color="text.secondary">
+                    {reviewRating}/10
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={!reviewTitle.trim() || !reviewBody.trim() || reviewSubmitting}
+                  >
+                    {reviewSubmitting ? 'Submitting...' : 'Submit Review'}
+                  </Button>
+                  <Button variant="outlined" onClick={() => setShowReviewForm(false)} disabled={reviewSubmitting}>
+                    Cancel
+                  </Button>
+                </Box>
+              </Box>
+            </Paper>
+          )}
+
+          {/* Existing Reviews */}
+          {currentMovie.reviews && currentMovie.reviews.length > 0 ? (
             <Box sx={{ mt: 3 }}>
               {currentMovie.reviews.map((review) => (
                 <Paper
@@ -354,9 +473,13 @@ export default function FilmDetailPage() {
                 </Paper>
               ))}
             </Box>
-          </Paper>
-        </Box>
-      )}
+          ) : (
+            <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+              No reviews yet. Be the first to write one!
+            </Typography>
+          )}
+        </Paper>
+      </Box>
     </Box>
   )
 }
