@@ -1,16 +1,8 @@
-import React, { createContext, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
 import { CssBaseline } from '@mui/material'
 import { lightTheme, darkTheme } from './themes'
-
-export type ThemeMode = 'light' | 'dark'
-
-export interface ThemeContextType {
-  mode: ThemeMode
-  toggleTheme: () => void
-}
-
-export const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
+import { ThemeContext, type ThemeMode } from './ThemeContext'
 
 interface ThemeProviderProps {
   children: React.ReactNode
