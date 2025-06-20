@@ -112,10 +112,7 @@ export default function Dashboard() {
                 variant="contained"
                 color="primary"
                 startIcon={<Add />}
-                onClick={() => {
-                  // TODO: Navigate to create genre form
-                  console.log('Create genre clicked')
-                }}
+                onClick={() => navigate('/create-genre')}
                 data-testid="create-genre-btn"
               >
                 Create Genre

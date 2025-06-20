@@ -1,3 +1,5 @@
+import type { Genre } from './genre'
+
 export interface Movie {
   id: number
   documentId: string
@@ -10,4 +12,5 @@ export interface Movie {
   publishedAt: string
   cover_image: string
   background_image: string
+  genres?: Genre[]
 }

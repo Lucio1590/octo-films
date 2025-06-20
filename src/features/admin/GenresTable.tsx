@@ -21,9 +21,11 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { fetchGenres, deleteGenreByDocumentId } from '../../store/slices/genresSlice'
+import { useNavigate } from 'react-router'
 
 export default function GenresTable() {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const [currentPage, setCurrentPage] = useState(1)
   const { genres, loading, error, pagination, sort } = useAppSelector((state) => state.genres)
 
@@ -45,8 +47,7 @@ export default function GenresTable() {
   }
 
   const handleEdit = (genre: { id: number; documentId: string }) => {
-    // TODO: Navigate to edit form
-    console.log('Edit genre:', genre)
+    navigate(`/manage-genre/${genre.documentId}`)
   }
 
   const handleDelete = (genre: { id: number; documentId: string; name: string }) => {
