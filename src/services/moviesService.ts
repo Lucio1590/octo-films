@@ -99,4 +99,17 @@ export class MoviesService {
   static async deleteMovieByDocumentId(documentId: string): Promise<{ data: Movie }> {
     return apiClient.delete<{ data: Movie }>(`/api/movies/${documentId}`)
   }
+
+  /**
+   * Fetches top movies by average rating.
+   * @param limit - Number of top movies to fetch (default: 10)
+   */
+  static async getTopMovies(limit: number = 10): Promise<MoviesResponse> {
+    const searchParams = new URLSearchParams()
+    searchParams.append('pagination[pageSize]', limit.toString())
+    searchParams.append('sort', 'average_rating:desc')
+    searchParams.append('populate', 'genres')
+
+    return apiClient.get<MoviesResponse>(`/api/movies?${searchParams.toString()}`)
+  }
 }

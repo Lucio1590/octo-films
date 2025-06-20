@@ -28,4 +28,5 @@ export interface MoviesState {
   importProgress: ImportProgress | null
   pagination: PaginationInfo | null
   sort: SortInfo
+  topMovies: Movie[]
 }

@@ -1,9 +1,10 @@
 import { createBrowserRouter, Navigate } from 'react-router'
 import App from './App'
 import LandingPage from './features/landing/HomePage'
-import FilmDashboard from './features/films/FilmDashboard'
+import FilmsHome from './features/films/FilmsHome'
 import FilmsList from './features/films/FilmsList'
 import FilmDetailPage from './features/films/FilmDetailPage'
+import GenresPage from './features/films/GenresPage'
 import MovieFormPage from './features/admin/MovieFormPage'
 import GenreFormPage from './features/admin/GenreFormPage'
 import UserProfile from './features/account/UserProfile'
@@ -23,9 +24,10 @@ export const router = createBrowserRouter([
         element: <RequireAuth />, // All protected routes
         children: [
           { path: 'dashboard', element: <Dashboard /> }, // Admin dashboard
-          { path: 'films', element: <FilmDashboard /> },
+          { path: 'films', element: <FilmsHome /> },
           { path: 'films/list', element: <FilmsList /> },
           { path: 'films/:id', element: <FilmDetailPage /> },
+          { path: 'genres', element: <GenresPage /> }, // Genres with top movies
           { path: 'create-film', element: <MovieFormPage /> }, // Create film (admin)
           { path: 'manage/:id', element: <MovieFormPage /> }, // Edit film (admin)
           { path: 'create-genre', element: <GenreFormPage /> }, // Create genre (admin)

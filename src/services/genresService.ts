@@ -13,6 +13,34 @@ export interface GenresResponse {
   }
 }
 
+export interface GenreWithTopMovies extends Genre {
+  topMovies: Array<{
+    id: number
+    documentId: string
+    title: string
+    description: string
+    release_date: string
+    average_rating: number
+    cover_image: string
+    background_image: string
+    createdAt: string
+    updatedAt: string
+    publishedAt: string
+  }>
+}
+
+export interface GenresWithTopMoviesResponse {
+  data: GenreWithTopMovies[]
+  meta: {
+    pagination: {
+      page: number
+      pageSize: number
+      pageCount: number
+      total: number
+    }
+  }
+}
+
 /**
  * GenresService provides methods to interact with the genres API endpoints.
  * These functions are designed specifically for a Strapi backend, following its conventions
@@ -110,5 +138,12 @@ export class GenresService {
    */
   static async deleteGenreByDocumentId(documentId: string): Promise<{ data: Genre }> {
     return apiClient.delete<{ data: Genre }>(`/api/genres/${documentId}`)
+  }
+
+  /**
+   * Fetches genres with their top movies by rating.
+   */
+  static async getGenresWithTopMovies(): Promise<GenresWithTopMoviesResponse> {
+    return apiClient.get<GenresWithTopMoviesResponse>('/api/genres-with-top-movies')
   }
 }

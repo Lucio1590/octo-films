@@ -17,6 +17,7 @@ const initialState: MoviesState = {
     field: 'title',
     direction: 'asc',
   },
+  topMovies: [],
 }
 
 // Async thunks
@@ -162,6 +163,18 @@ export const importMoviesFromJSON = createAsyncThunk(
   },
 )
 
+export const fetchTopMovies = createAsyncThunk(
+  'movies/fetchTopMovies',
+  async (limit: number = 10, { rejectWithValue }) => {
+    try {
+      const response = await MoviesService.getTopMovies(limit)
+      return response
+    } catch (error) {
+      return rejectWithValue(error)
+    }
+  },
+)
+
 // Movies slice
 const moviesSlice = createSlice({
   name: 'movies',
@@ -293,6 +306,20 @@ const moviesSlice = createSlice({
       })
       .addCase(importMoviesFromJSON.rejected, (state, action) => {
         state.importing = false
+        state.error = getErrorMessage(action.payload)
+      })
+      // Fetch top movies cases
+      .addCase(fetchTopMovies.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchTopMovies.fulfilled, (state, action) => {
+        state.loading = false
+        state.topMovies = action.payload.data
+        state.error = null
+      })
+      .addCase(fetchTopMovies.rejected, (state, action) => {
+        state.loading = false
         state.error = getErrorMessage(action.payload)
       })
   },
